@@ -1,0 +1,24 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.dist-info/
+# Virtual envs
+venv/
+.env
+# Tests (they are not needed in the image)
+tests/
+# Documentation and markdown
+*.md
+# Local SQLite DB (will be mounted as volume)
+travel_planner.db
+# IDE / OS files
+*.swp
+.DS_Store
+Thumbs.db
+# Docker artefacts
+Dockerfile
+docker-compose.yml
+

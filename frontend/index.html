@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#12172E">
+  <title>Star Dream Line Travels | DLT AI Agent</title>
+  <link rel="icon" type="image/png" href="/static/assets/dreamline-logo.png">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <a href="#" class="brand">
+      <div class="brand-logo-wrap">
+        <img
+          src="/static/assets/dreamline-logo.png"
+          alt="Dream Line Travels Logo"
+          class="brand-logo"
+        >
+      </div>
+
+      <div class="brand-text">
+        <span class="brand-name">DreamLine AI Agent</span>
+        <span class="brand-sub">Powered by Dream Line Travels</span>
+      </div>
+    </a>
+
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#" class="nav-link">Home</a>
+      <a href="#tripForm" class="nav-link">Plan Trip</a>
+      <a href="#about" class="nav-link">About Us</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-label">POWERED BY DREAM LINE TRAVELS</div>
+
+    <h1>Explore the World with DreamLine AI</h1>
+
+    <p>
+      Plan smarter, travel better. Discover destinations, explore
+      hotels, estimate budgets, and create personalized itineraries
+      with our intelligent AI travel assistant.
+    </p>
+  </section>
+
+  <!-- TRIP FORM -->
+  <section class="glass-card planner-card">
+    <form id="tripForm">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="destination">Destination City</label>
+          <input
+            type="text"
+            id="destination"
+            class="form-control"
+            placeholder="e.g. Tokyo, Paris, Dubai"
+            value="Tokyo"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="departure">Departure City</label>
+          <input
+            type="text"
+            id="departure"
+            class="form-control"
+            placeholder="e.g. Kochi, Delhi, London"
+            value="San Francisco"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="duration">Duration (Days)</label>
+          <input
+            type="number"
+            id="duration"
+            class="form-control"
+            min="1"
+            max="14"
+            value="3"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="budget">Total Budget ($ USD)</label>
+          <input
+            type="number"
+            id="budget"
+            class="form-control"
+            min="200"
+            step="50"
+            value="1200"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="travelers">Travelers Count</label>
+          <input
+            type="number"
+            id="travelers"
+            class="form-control"
+            min="1"
+            max="10"
+            value="2"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="hotelTier">Accommodation Style</label>
+          <select id="hotelTier" class="form-control">
+            <option value="budget">Budget (Hostels / Pods)</option>
+            <option value="mid" selected>
+              Mid-Scale (Boutique / 3-4★)
+            </option>
+            <option value="luxury">
+              Luxury (5★ Resorts &amp; Spas)
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="form-group preferences-group">
+        <label>Travel Preferences &amp; Interests</label>
+
+        <div class="preference-chips">
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="culture" checked>
+            🏛️ Culture &amp; Heritage
+          </label>
+
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="sightseeing" checked>
+            🗼 Sightseeing Landmarks
+          </label>
+
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="nature">
+            🌿 Nature &amp; Parks
+          </label>
+
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="shopping">
+            🛍️ Shopping &amp; Tech
+          </label>
+
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="culinary" checked>
+            🍜 Culinary &amp; Street Food
+          </label>
+
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="relaxation">
+            ☕ Relaxed Pace
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="generatePlanBtn">
+        🚀 Generate Itinerary with DreamLine AI
+      </button>
+
+    </form>
+  </section>
+
+  <!-- AGENT TRACKER -->
+  <section class="glass-card agent-tracker" id="agentTracker">
+    <div class="tracker-title">
+      🤖 DreamLine Multi-Agent Execution Pipeline
+    </div>
+
+    <div class="agents-flow">
+
+      <div class="agent-card" id="agent-manager">
+        <div class="icon">🧭</div>
+        <div class="role">Travel Manager</div>
+        <div class="status-text">Waiting...</div>
+      </div>
+
+      <div class="agent-card" id="agent-dest">
+        <div class="icon">🏛️</div>
+        <div class="role">Destination Agent</div>
+        <div class="status-text">Waiting...</div>
+      </div>
+
+      <div class="agent-card" id="agent-weather">
+        <div class="icon">☀️</div>
+        <div class="role">Weather Agent</div>
+        <div class="status-text">Waiting...</div>
+      </div>
+
+      <div class="agent-card" id="agent-hotel">
+        <div class="icon">🏨</div>
+        <div class="role">Hotel Agent</div>
+        <div class="status-text">Waiting...</div>
+      </div>
+
+      <div class="agent-card" id="agent-budget">
+        <div class="icon">💰</div>
+        <div class="role">Budget Agent</div>
+        <div class="status-text">Waiting...</div>
+      </div>
+
+      <div class="agent-card" id="agent-itinerary">
+        <div class="icon">🗺️</div>
+        <div class="role">Itinerary Agent</div>
+        <div class="status-text">Waiting...</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="results-dashboard" id="resultsDashboard">
+
+    <div class="dashboard-header">
+      <div>
+        <h2 id="resDestTitle">Tokyo (3 Days)</h2>
+        <p>
+          Personalized multi-agent itinerary compiled by DreamLine AI.
+        </p>
+      </div>
+
+      <button class="btn-pdf" id="downloadPdfBtn">
+        📄 Download PDF Itinerary
+      </button>
+    </div>
+
+    <div class="overview-grid">
+      <div class="mini-card">
+        <h4>Total Budget</h4>
+        <div class="val" id="resBudgetVal">$1,200</div>
+      </div>
+
+      <div class="mini-card">
+        <h4>Group Size</h4>
+        <div class="val" id="resTravelersVal">2 Guests</div>
+      </div>
+
+      <div class="mini-card">
+        <h4>Weather Forecast</h4>
+        <div class="val" id="resWeatherVal">—</div>
+        <div class="weather-advisory" id="resWeatherAdvisory"></div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <h3>💰 Budget Distribution</h3>
+
+      <div class="overview-grid">
+        <div class="mini-card">
+          <h4>Estimated Food Allowance</h4>
+          <div class="val" id="resFoodVal">—</div>
+        </div>
+
+        <div class="mini-card">
+          <h4>Local Transit &amp; Subways</h4>
+          <div class="val" id="resTransitVal">—</div>
+        </div>
+
+        <div class="mini-card">
+          <h4>Emergency Safety Buffer</h4>
+          <div class="val" id="resBufferVal">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <h3>🏨 Curated Hotel Recommendations</h3>
+      <div class="hotels-grid" id="resHotelsList"></div>
+    </div>
+
+    <div class="glass-card">
+      <h3>📅 Day-by-Day Detailed Itinerary</h3>
+      <div class="timeline" id="resTimeline"></div>
+    </div>
+
+  </section>
+
+  <!-- CHAT ASSISTANT -->
+  <div class="chat-drawer collapsed" id="chatDrawer">
+
+    <button
+      type="button"
+      class="chat-header"
+      id="chatHeader"
+      aria-expanded="false"
+    >
+      <span>💬 DreamLine AI Travel Assistant</span>
+      <span class="chat-hint">Open</span>
+    </button>
+
+    <div class="chat-messages" id="chatMessages" aria-live="polite">
+      <div class="chat-bubble assistant">
+        Hello! Welcome to Dream Line Travels. I'm your AI travel assistant.
+        How can I help you plan your next trip?
+      </div>
+    </div>
+
+    <div class="chat-input-bar">
+      <input
+        type="text"
+        id="chatInput"
+        placeholder="Ask to modify your trip..."
+        aria-label="Chat message"
+      >
+      <button type="button" id="sendChatBtn">Send</button>
+    </div>
+
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about" class="glass-card about-section">
+    <h3>About Dream Line Travels</h3>
+
+    <p>
+      Dream Line Travels combines AI technology with travel expertise
+      to deliver personalized itineraries. DreamLine AI Agent coordinates
+      specialized agents to help research destinations, hotels,
+      budgets, and travel experiences.
+    </p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 Dream Line Travels. All Rights Reserved.</p>
+    <p>
+      Powered by <strong>DreamLine AI Agent</strong>
+      | Your Intelligent Travel Companion
+    </p>
+  </footer>
+
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

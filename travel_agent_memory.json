@@ -1,0 +1,152 @@
+{
+  "test_api_traveler": {
+    "preferences": {
+      "travel_interests": [
+        "culture",
+        "sightseeing"
+      ],
+      "preferred_hotel_tier": "mid"
+    },
+    "past_trips": [
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      }
+    ]
+  },
+  "traveler_api_tester": {
+    "preferences": {
+      "travel_interests": [
+        "culture",
+        "heritage",
+        "palaces"
+      ],
+      "preferred_hotel_tier": "mid"
+    },
+    "past_trips": [
+      {
+        "destination": "Jaipur",
+        "summary": "3-day trip",
+        "total_spent_usd": 800.0
+      },
+      {
+        "destination": "Jaipur",
+        "summary": "3-day trip",
+        "total_spent_usd": 800.0
+      }
+    ]
+  },
+  "user_web_guest": {
+    "preferences": {
+      "travel_interests": [
+        "culture",
+        "sightseeing",
+        "culinary"
+      ],
+      "preferred_hotel_tier": "mid"
+    },
+    "past_trips": [
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "kerala",
+        "summary": "5-day trip",
+        "total_spent_usd": 200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      },
+      {
+        "destination": "Tokyo",
+        "summary": "3-day trip",
+        "total_spent_usd": 1200.0
+      }
+    ]
+  }
+}
