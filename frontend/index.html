@@ -1,17 +1,19 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr" id="htmlRoot">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#12172E">
-  <title>Star Dream Line Travels | DLT AI Agent</title>
+  <title>Dream Line Travels | DreamLine AI Travel Assistant</title>
   <link rel="icon" type="image/png" href="/static/assets/dreamline-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="mainContainer">
 
   <!-- NAVBAR -->
   <header class="navbar">
@@ -21,66 +23,73 @@
           src="/static/assets/dreamline-logo.png"
           alt="Dream Line Travels Logo"
           class="brand-logo"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='✈️';"
         >
       </div>
-
       <div class="brand-text">
-        <span class="brand-name">DreamLine AI Agent</span>
-        <span class="brand-sub">Powered by Dream Line Travels</span>
+        <span class="brand-name" data-en="DreamLine AI Agent" data-ar="وكيل دريم لاين الذكي">DreamLine AI Agent</span>
+        <span class="brand-sub" data-en="Powered by Dream Line Travels" data-ar="من تقديم دريم لاين للسفر">Powered by Dream Line Travels</span>
       </div>
     </a>
 
     <nav class="nav-links" aria-label="Main navigation">
-      <a href="#" class="nav-link">Home</a>
-      <a href="#tripForm" class="nav-link">Plan Trip</a>
-      <a href="#about" class="nav-link">About Us</a>
+      <a href="#" class="nav-link" data-en="Home" data-ar="الرئيسية">Home</a>
+      <a href="#tripForm" class="nav-link" data-en="Plan Trip" data-ar="خطط رحلتك">Plan Trip</a>
+      <a href="#about" class="nav-link" data-en="About Us" data-ar="من نحن">About Us</a>
+
+      <!-- Language Switcher -->
+      <div class="lang-switcher" id="langSwitcher" role="group" aria-label="Language selector">
+        <button class="lang-btn active" id="btnLangEn" data-lang="en" aria-pressed="true">EN</button>
+        <button class="lang-btn" id="btnLangAr" data-lang="ar" aria-pressed="false">عربي</button>
+      </div>
     </nav>
   </header>
 
+  <!-- API KEY WARNING BANNER (shown if key not configured) -->
+  <div class="api-warning" id="apiWarning" style="display:none;">
+    <span id="apiWarningText">⚠️ Gemini AI is not configured. Chat responses will be unavailable until you add your API key to <code>backend/.env</code>. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get a free key here →</a></span>
+  </div>
+
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-label">POWERED BY DREAM LINE TRAVELS</div>
-
-    <h1>Explore the World with DreamLine AI</h1>
-
-    <p>
-      Plan smarter, travel better. Discover destinations, explore
-      hotels, estimate budgets, and create personalized itineraries
-      with our intelligent AI travel assistant.
+    <div class="hero-label" data-en="POWERED BY DREAM LINE TRAVELS" data-ar="من تقديم دريم لاين للسفر">POWERED BY DREAM LINE TRAVELS</div>
+    <h1 data-en="Explore the World with DreamLine AI" data-ar="استكشف العالم مع دريم لاين الذكي">Explore the World with DreamLine AI</h1>
+    <p data-en="Plan smarter, travel better. Discover destinations, explore hotels, estimate budgets, and create personalized itineraries with our intelligent AI travel assistant." data-ar="خطط بذكاء وسافر بأسلوب أفضل. اكتشف الوجهات وابحث عن الفنادق وقدّر الميزانية وأنشئ خططاً مخصصة مع مساعد السفر الذكي من دريم لاين.">
+      Plan smarter, travel better. Discover destinations, explore hotels, estimate budgets, and create personalized itineraries with our intelligent AI travel assistant.
     </p>
   </section>
 
   <!-- TRIP FORM -->
-  <section class="glass-card planner-card">
-    <form id="tripForm">
+  <section class="glass-card planner-card" id="tripForm">
+    <form id="tripFormEl">
 
       <div class="form-grid">
 
         <div class="form-group">
-          <label for="destination">Destination City</label>
+          <label for="destination" data-en="Destination City" data-ar="مدينة الوجهة">Destination City</label>
           <input
             type="text"
             id="destination"
             class="form-control"
-            placeholder="e.g. Tokyo, Paris, Dubai"
-            value="Tokyo"
+            placeholder="e.g. Dubai, Paris, Tokyo"
+            value="Dubai"
             required
           >
         </div>
 
         <div class="form-group">
-          <label for="departure">Departure City</label>
+          <label for="departure" data-en="Departure City" data-ar="مدينة المغادرة">Departure City</label>
           <input
             type="text"
             id="departure"
             class="form-control"
             placeholder="e.g. Kochi, Delhi, London"
-            value="San Francisco"
+            value="Abu Dhabi"
           >
         </div>
 
         <div class="form-group">
-          <label for="duration">Duration (Days)</label>
+          <label for="duration" data-en="Duration (Days)" data-ar="المدة (أيام)">Duration (Days)</label>
           <input
             type="number"
             id="duration"
@@ -93,20 +102,20 @@
         </div>
 
         <div class="form-group">
-          <label for="budget">Total Budget ($ USD)</label>
+          <label for="budget" data-en="Total Budget (AED)" data-ar="الميزانية الإجمالية (درهم)">Total Budget (AED)</label>
           <input
             type="number"
             id="budget"
             class="form-control"
-            min="200"
-            step="50"
-            value="1200"
+            min="500"
+            step="100"
+            value="5000"
             required
           >
         </div>
 
         <div class="form-group">
-          <label for="travelers">Travelers Count</label>
+          <label for="travelers" data-en="Travelers Count" data-ar="عدد المسافرين">Travelers Count</label>
           <input
             type="number"
             id="travelers"
@@ -119,58 +128,57 @@
         </div>
 
         <div class="form-group">
-          <label for="hotelTier">Accommodation Style</label>
+          <label for="hotelTier" data-en="Accommodation Style" data-ar="نوع الإقامة">Accommodation Style</label>
           <select id="hotelTier" class="form-control">
-            <option value="budget">Budget (Hostels / Pods)</option>
-            <option value="mid" selected>
-              Mid-Scale (Boutique / 3-4★)
-            </option>
-            <option value="luxury">
-              Luxury (5★ Resorts &amp; Spas)
-            </option>
+            <option value="budget" data-en="Budget (Hostels / 2★)" data-ar="اقتصادي (نزل / 2 نجوم)">Budget (Hostels / 2★)</option>
+            <option value="mid" selected data-en="Mid-Scale (Boutique / 3-4★)" data-ar="متوسط (بوتيك / 3-4 نجوم)">Mid-Scale (Boutique / 3-4★)</option>
+            <option value="luxury" data-en="Luxury (5★ Resorts)" data-ar="فاخر (منتجعات 5 نجوم)">Luxury (5★ Resorts)</option>
           </select>
         </div>
 
       </div>
 
       <div class="form-group preferences-group">
-        <label>Travel Preferences &amp; Interests</label>
+        <label data-en="Travel Preferences &amp; Interests" data-ar="تفضيلات السفر والاهتمامات">Travel Preferences &amp; Interests</label>
 
         <div class="preference-chips">
           <label class="chip-label">
             <input type="checkbox" name="preferences" value="culture" checked>
-            🏛️ Culture &amp; Heritage
+            🏛️ <span data-en="Culture &amp; Heritage" data-ar="الثقافة والتراث">Culture &amp; Heritage</span>
           </label>
-
           <label class="chip-label">
             <input type="checkbox" name="preferences" value="sightseeing" checked>
-            🗼 Sightseeing Landmarks
+            🗼 <span data-en="Sightseeing" data-ar="السياحة">Sightseeing</span>
           </label>
-
           <label class="chip-label">
             <input type="checkbox" name="preferences" value="nature">
-            🌿 Nature &amp; Parks
+            🌿 <span data-en="Nature &amp; Parks" data-ar="الطبيعة والحدائق">Nature &amp; Parks</span>
           </label>
-
           <label class="chip-label">
             <input type="checkbox" name="preferences" value="shopping">
-            🛍️ Shopping &amp; Tech
+            🛍️ <span data-en="Shopping" data-ar="التسوق">Shopping</span>
           </label>
-
           <label class="chip-label">
             <input type="checkbox" name="preferences" value="culinary" checked>
-            🍜 Culinary &amp; Street Food
+            🍜 <span data-en="Food &amp; Dining" data-ar="الطعام والمطاعم">Food &amp; Dining</span>
           </label>
-
           <label class="chip-label">
             <input type="checkbox" name="preferences" value="relaxation">
-            ☕ Relaxed Pace
+            ☕ <span data-en="Relaxed Pace" data-ar="وتيرة استرخاء">Relaxed Pace</span>
+          </label>
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="adventure">
+            🏄 <span data-en="Adventure" data-ar="المغامرة">Adventure</span>
+          </label>
+          <label class="chip-label">
+            <input type="checkbox" name="preferences" value="family">
+            👨‍👩‍👧 <span data-en="Family Activities" data-ar="أنشطة عائلية">Family Activities</span>
           </label>
         </div>
       </div>
 
       <button type="submit" class="btn-primary" id="generatePlanBtn">
-        🚀 Generate Itinerary with DreamLine AI
+        <span data-en="🚀 Generate Itinerary with DreamLine AI" data-ar="🚀 إنشاء خطة السفر مع دريم لاين">🚀 Generate Itinerary with DreamLine AI</span>
       </button>
 
     </form>
@@ -178,7 +186,7 @@
 
   <!-- AGENT TRACKER -->
   <section class="glass-card agent-tracker" id="agentTracker">
-    <div class="tracker-title">
+    <div class="tracker-title" data-en="🤖 DreamLine Multi-Agent Execution Pipeline" data-ar="🤖 منظومة وكلاء دريم لاين متعددي المهام">
       🤖 DreamLine Multi-Agent Execution Pipeline
     </div>
 
@@ -186,38 +194,38 @@
 
       <div class="agent-card" id="agent-manager">
         <div class="icon">🧭</div>
-        <div class="role">Travel Manager</div>
-        <div class="status-text">Waiting...</div>
+        <div class="role" data-en="Travel Manager" data-ar="مدير السفر">Travel Manager</div>
+        <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
 
       <div class="agent-card" id="agent-dest">
         <div class="icon">🏛️</div>
-        <div class="role">Destination Agent</div>
-        <div class="status-text">Waiting...</div>
+        <div class="role" data-en="Destination Agent" data-ar="وكيل الوجهات">Destination Agent</div>
+        <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
 
       <div class="agent-card" id="agent-weather">
         <div class="icon">☀️</div>
-        <div class="role">Weather Agent</div>
-        <div class="status-text">Waiting...</div>
+        <div class="role" data-en="Weather Agent" data-ar="وكيل الطقس">Weather Agent</div>
+        <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
 
       <div class="agent-card" id="agent-hotel">
         <div class="icon">🏨</div>
-        <div class="role">Hotel Agent</div>
-        <div class="status-text">Waiting...</div>
+        <div class="role" data-en="Hotel Agent" data-ar="وكيل الفنادق">Hotel Agent</div>
+        <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
 
       <div class="agent-card" id="agent-budget">
         <div class="icon">💰</div>
-        <div class="role">Budget Agent</div>
-        <div class="status-text">Waiting...</div>
+        <div class="role" data-en="Budget Agent" data-ar="وكيل الميزانية">Budget Agent</div>
+        <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
 
       <div class="agent-card" id="agent-itinerary">
         <div class="icon">🗺️</div>
-        <div class="role">Itinerary Agent</div>
-        <div class="status-text">Waiting...</div>
+        <div class="role" data-en="Itinerary Agent" data-ar="وكيل البرامج السياحية">Itinerary Agent</div>
+        <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
 
     </div>
@@ -228,63 +236,57 @@
 
     <div class="dashboard-header">
       <div>
-        <h2 id="resDestTitle">Tokyo (3 Days)</h2>
-        <p>
+        <h2 id="resDestTitle">Dubai (3 Days)</h2>
+        <p data-en="Personalized multi-agent itinerary compiled by DreamLine AI." data-ar="برنامج سياحي مخصص أعده دريم لاين الذكي.">
           Personalized multi-agent itinerary compiled by DreamLine AI.
         </p>
       </div>
-
       <button class="btn-pdf" id="downloadPdfBtn">
-        📄 Download PDF Itinerary
+        📄 <span data-en="Download PDF Itinerary" data-ar="تحميل البرنامج السياحي PDF">Download PDF Itinerary</span>
       </button>
     </div>
 
     <div class="overview-grid">
       <div class="mini-card">
-        <h4>Total Budget</h4>
-        <div class="val" id="resBudgetVal">$1,200</div>
+        <h4 data-en="Total Budget" data-ar="الميزانية الإجمالية">Total Budget</h4>
+        <div class="val" id="resBudgetVal">AED 5,000</div>
       </div>
-
       <div class="mini-card">
-        <h4>Group Size</h4>
+        <h4 data-en="Group Size" data-ar="حجم المجموعة">Group Size</h4>
         <div class="val" id="resTravelersVal">2 Guests</div>
       </div>
-
       <div class="mini-card">
-        <h4>Weather Forecast</h4>
+        <h4 data-en="Weather Forecast" data-ar="توقعات الطقس">Weather Forecast</h4>
         <div class="val" id="resWeatherVal">—</div>
         <div class="weather-advisory" id="resWeatherAdvisory"></div>
       </div>
     </div>
 
     <div class="glass-card">
-      <h3>💰 Budget Distribution</h3>
-
+      <h3>💰 <span data-en="Budget Distribution" data-ar="توزيع الميزانية">Budget Distribution</span></h3>
       <div class="overview-grid">
         <div class="mini-card">
-          <h4>Estimated Food Allowance</h4>
+          <h4 data-en="Estimated Food Allowance" data-ar="المخصص التقديري للطعام">Estimated Food Allowance</h4>
           <div class="val" id="resFoodVal">—</div>
         </div>
-
         <div class="mini-card">
-          <h4>Local Transit &amp; Subways</h4>
+          <h4 data-en="Local Transit" data-ar="المواصلات المحلية">Local Transit</h4>
           <div class="val" id="resTransitVal">—</div>
         </div>
-
         <div class="mini-card">
-          <h4>Emergency Safety Buffer</h4>
+          <h4 data-en="Emergency Buffer" data-ar="احتياطي الطوارئ">Emergency Buffer</h4>
           <div class="val" id="resBufferVal">—</div>
         </div>
       </div>
     </div>
 
     <div class="glass-card">
-      <h3>🏨 Curated Hotel Recommendations</h3>
+      <h3>🏨 <span data-en="Curated Hotel Recommendations" data-ar="توصيات الفنادق المختارة">Curated Hotel Recommendations</span></h3>
       <div class="hotels-grid" id="resHotelsList"></div>
     </div>
 
     <div class="glass-card">
-      <h3>📅 Day-by-Day Detailed Itinerary</h3>
+      <h3>📅 <span data-en="Day-by-Day Detailed Itinerary" data-ar="البرنامج اليومي التفصيلي">Day-by-Day Detailed Itinerary</span></h3>
       <div class="timeline" id="resTimeline"></div>
     </div>
 
@@ -299,51 +301,58 @@
       id="chatHeader"
       aria-expanded="false"
     >
-      <span>💬 DreamLine AI Travel Assistant</span>
-      <span class="chat-hint">Open</span>
+      <span>💬 <span data-en="DreamLine AI Travel Assistant" data-ar="مساعد دريم لاين للسفر">DreamLine AI Travel Assistant</span></span>
+      <span class="chat-hint" data-en="Open" data-ar="افتح">Open</span>
     </button>
 
-    <div class="chat-messages" id="chatMessages" aria-live="polite">
-      <div class="chat-bubble assistant">
-        Hello! Welcome to Dream Line Travels. I'm your AI travel assistant.
-        How can I help you plan your next trip?
+    <!-- Chat toolbar -->
+    <div class="chat-toolbar" id="chatToolbar">
+      <button class="chat-tool-btn" id="clearChatBtn" title="Clear chat">
+        🗑️ <span data-en="Clear" data-ar="مسح">Clear</span>
+      </button>
+      <div class="chat-lang-info" id="chatLangInfo">
+        <span data-en="Responding in: English" data-ar="يرد بـ: العربية">Responding in: English</span>
       </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages" aria-live="polite">
+      <!-- Welcome message injected by JS -->
     </div>
 
     <div class="chat-input-bar">
       <input
         type="text"
         id="chatInput"
-        placeholder="Ask to modify your trip..."
+        placeholder="Ask about Dubai, Abu Dhabi, hotels, itineraries..."
         aria-label="Chat message"
+        maxlength="1000"
       >
-      <button type="button" id="sendChatBtn">Send</button>
+      <button type="button" id="sendChatBtn" aria-label="Send message">
+        <span data-en="Send" data-ar="إرسال">Send</span>
+      </button>
     </div>
 
   </div>
 
   <!-- ABOUT -->
   <section id="about" class="glass-card about-section">
-    <h3>About Dream Line Travels</h3>
-
-    <p>
-      Dream Line Travels combines AI technology with travel expertise
-      to deliver personalized itineraries. DreamLine AI Agent coordinates
-      specialized agents to help research destinations, hotels,
-      budgets, and travel experiences.
+    <h3 data-en="About Dream Line Travels" data-ar="عن دريم لاين للسفر">About Dream Line Travels</h3>
+    <p data-en="Dream Line Travels combines AI technology with deep travel expertise to deliver personalized itineraries for the UAE and beyond. DreamLine AI Agent coordinates specialized agents to research destinations, hotels, budgets, and travel experiences — all tailored to your preferences." data-ar="تجمع دريم لاين للسفر بين تقنية الذكاء الاصطناعي والخبرة السياحية العميقة لتقديم برامج سياحية مخصصة في الإمارات وخارجها. يقوم دريم لاين الذكي بتنسيق وكلاء متخصصين للبحث عن الوجهات والفنادق والميزانيات وتجارب السفر، كلها مصممة وفق تفضيلاتك.">
+      Dream Line Travels combines AI technology with deep travel expertise to deliver personalized itineraries for the UAE and beyond. DreamLine AI Agent coordinates specialized agents to research destinations, hotels, budgets, and travel experiences — all tailored to your preferences.
     </p>
   </section>
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>© 2026 Dream Line Travels. All Rights Reserved.</p>
+    <p>© 2026 Dream Line Travels. <span data-en="All Rights Reserved." data-ar="جميع الحقوق محفوظة.">All Rights Reserved.</span></p>
     <p>
-      Powered by <strong>DreamLine AI Agent</strong>
-      | Your Intelligent Travel Companion
+      <span data-en="Powered by" data-ar="مشغّل بواسطة">Powered by</span>
+      <strong>DreamLine AI Agent</strong>
+      | <span data-en="Your Intelligent Travel Companion" data-ar="رفيقك الذكي في السفر">Your Intelligent Travel Companion</span>
     </p>
   </footer>
 
-</div>
+</div><!-- end .container -->
 
 <script src="/static/js/app.js"></script>
 </body>

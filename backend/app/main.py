@@ -38,6 +38,7 @@ from app.services.llm_service import (
     LLMServiceError
 )
 from app.config import settings
+from app.services.currency_service import convert as currency_convert, format_conversion_reply, get_rates, SUPPORTED as SUPPORTED_CURRENCIES
 
 # In-memory and persistent SQLite database (Phase 2)
 TRIP_STORAGE: Dict[str, Dict[str, Any]] = {}
@@ -76,12 +77,55 @@ def health_check():
     """System health check and diagnostic status."""
     return {
         "status": "online",
-        "service": "AI Travel Planning Agent",
+        "service": "DreamLine AI Travel Agent",
         "version": "1.0.0",
         "tools_loaded": 4,
         "agents_active": 6,
-        "memory_store": "active"
+        "memory_store": "active",
+        "gemini_configured": llm_service.is_configured()
     }
+
+
+@app.get("/api/check-key")
+def check_api_key():
+    """Diagnostic: check whether Gemini API key is loaded (never exposes the key value)."""
+    configured = llm_service.is_configured()
+    return {
+        "gemini_configured": configured,
+        "message": (
+            "Gemini API key is loaded and ready." if configured
+            else "GEMINI_API_KEY is not set or still a placeholder. "
+                 "Edit backend/.env and add your real API key from https://aistudio.google.com/app/apikey"
+        )
+    }
+
+
+@app.get("/api/currency/rates")
+def get_currency_rates():
+    """Return current USD-based exchange rates and their source."""
+    try:
+        rates, source, fetched_at = get_rates()
+        import datetime
+        return {
+            "base": "USD",
+            "rates": {k: rates[k] for k in SUPPORTED_CURRENCIES if k in rates},
+            "source": source,
+            "fetched_at": datetime.datetime.fromtimestamp(fetched_at).strftime("%Y-%m-%d %H:%M UTC"),
+            "supported_currencies": SUPPORTED_CURRENCIES
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Could not fetch exchange rates: {exc}")
+
+
+@app.get("/api/currency/convert")
+def convert_currency(amount: float, from_currency: str, to_currency: str):
+    """Convert an amount between supported currencies."""
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be greater than zero.")
+    result = currency_convert(amount, from_currency, to_currency)
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
 
 
 @app.post("/api/trip/plan", response_model=TripPlanResponse)
@@ -197,33 +241,72 @@ def chat_with_agent(chat_req: ChatRequest):
         if owner_id and owner_id != chat_req.user_id:
             raise HTTPException(status_code=404, detail="Trip record not found.")
 
+    lang = getattr(chat_req, "language", "en") or "en"
     history = db_manager.get_chat_history(chat_req.user_id, chat_req.trip_id)
     trip_context = _chat_trip_context(plan, chat_req)
+
+    # ── Currency detection: handle conversion questions directly ──────────
+    currency_context = _detect_and_convert_currency(chat_req.message, lang)
+
+    arabic_instruction = ""
+    if lang == "ar":
+        arabic_instruction = (
+            "IMPORTANT: The user has selected Arabic language. "
+            "Respond in professional, friendly Modern Standard Arabic (Gulf Arabic style). "
+            "Use AED (درهم) for UAE prices and INR (روبية) for India prices. "
+            "Keep all JSON keys in English.\n\n"
+        )
+
     prompt = (
-        "You are the conversational AI travel assistant for Dream Line Travels. "
-        "Respond naturally to greetings, capability questions, destination questions, and follow-ups. "
-        "Use the supplied conversation and trip data to answer questions about the itinerary, travelers, "
-        "duration, destination, and budget. Give useful attractions, restaurant, and hotel suggestions; "
-        "do not claim live availability or prices unless supplied in context. Suggest practical lower-cost "
-        "alternatives when asked. Never claim that a trip was changed unless you return a concrete "
-        "updated_plan. If there is no active trip, explain that a trip must be generated before making "
-        "itinerary changes.\n\n"
-        "Return exactly one JSON object with string field 'reply' and field 'updated_plan'. "
-        "Set updated_plan to null for ordinary questions. For a requested trip change, return only the "
-        "changed fields in updated_plan, using only these keys: destination, duration_days, budget, "
-        "travelers, weather_summary, hotels, budget_breakdown, daily_itinerary, final_report. "
-        "For destination changes, set the new destination; the server will rebuild the destination-specific "
-        "itinerary. For other itinerary changes, provide concrete replacement values. Do not wrap JSON "
-        "in markdown.\n\n"
-        f"Current trip data: {json.dumps(trip_context, ensure_ascii=False)}\n"
-        f"Conversation history: {json.dumps(history, ensure_ascii=False)}\n"
-        f"Current user message: {chat_req.message}"
+        "You are DreamLine AI Travel Assistant – a professional, friendly, and knowledgeable "
+        "travel consultant for Dream Line Travels.\n"
+        "Tagline: 'Your Intelligent Travel Companion'.\n\n"
+
+        "EXPERTISE:\n"
+        "1. UAE TRAVEL: Dubai (Burj Khalifa, Dubai Mall, Desert Safari, Palm Jumeirah, Dubai Creek, "
+        "Gold Souk, Dubai Frame, Miracle Garden), Abu Dhabi (Sheikh Zayed Grand Mosque, Louvre, "
+        "Ferrari World, Yas Island, Corniche), Sharjah (Blue Souk, Al Noor Island, Heritage Area), "
+        "Ras Al Khaimah, Fujairah, Ajman, Umm Al Quwain.\n"
+        "2. INDIA TRAVEL: Kerala (Munnar tea gardens, Alleppey backwaters, Wayanad forests, "
+        "Kochi Fort, Kozhikode beach), Goa (beaches, spice plantations, Portuguese heritage), "
+        "Rajasthan (Jaipur Pink City, Udaipur lakes, Jodhpur Blue City), Delhi (Red Fort, "
+        "Qutub Minar, Chandni Chowk), Mumbai (Gateway of India, Marine Drive, Bollywood), "
+        "Tamil Nadu (Ooty, Kodaikanal, Madurai Meenakshi Temple), Karnataka (Coorg, Mysore), "
+        "Himachal Pradesh (Shimla, Manali), and all other Indian destinations.\n"
+        "3. INDIA ↔ UAE TRAVEL: Flight routes, visa requirements, travel tips for both markets.\n"
+        "4. CURRENCIES: INR (₹) for India, AED (د.إ) for UAE, USD ($) internationally. "
+        "Always label prices as ESTIMATED.\n\n"
+
+        "CURRENCY CONVERSION CAPABILITY:\n"
+        f"{currency_context}\n\n"
+
+        "RULES:\n"
+        "- Ask follow-up questions when destination, budget, duration or traveller count is missing.\n"
+        "- Never claim a hotel, flight or tour is booked unless a real system confirms it.\n"
+        "- Distinguish estimated prices from actual prices clearly.\n"
+        "- Support mixed Arabic-English messages.\n\n"
+        + arabic_instruction +
+
+        "RESPONSE FORMAT:\n"
+        "Return exactly one JSON object with no markdown fences:\n"
+        '{"reply": "<your answer>", "updated_plan": null}\n\n'
+        "Rules:\n"
+        "- 'reply': non-empty string, your full helpful answer.\n"
+        "- 'updated_plan': null for most replies; a dict only if the user explicitly asks to change "
+        "the current trip itinerary (allowed keys: destination, duration_days, budget, travelers, "
+        "weather_summary, hotels, budget_breakdown, daily_itinerary, final_report).\n"
+        "- Do NOT wrap JSON in ```json``` markdown.\n"
+        "- Always reply helpfully. Never refuse.\n\n"
+
+        f"Current trip: {json.dumps(trip_context, ensure_ascii=False)}\n"
+        f"Recent history (last 10): {json.dumps(history[-10:] if history else [], ensure_ascii=False)}\n"
+        f"User message: {chat_req.message}"
     )
 
     try:
         raw_response = llm_service.generate(
             prompt,
-            temperature=0.3,
+            temperature=0.4,
             allow_offline_fallback=False
         )
         result = _parse_chat_result(raw_response)
@@ -244,8 +327,57 @@ def chat_with_agent(chat_req: ChatRequest):
     return ChatResponse(
         reply=result["reply"],
         updated_plan=updated_plan,
-        agent_thoughts=["Gemini generated the response using this trip conversation."]
+        agent_thoughts=["DreamLine AI generated this response via Gemini."]
     )
+
+
+def _detect_and_convert_currency(message: str, lang: str = "en") -> str:
+    """
+    Detect currency conversion intent in the message and pre-compute the result
+    so the AI can include it accurately in the reply.
+    """
+    import re
+    msg_lower = message.lower()
+
+    # Patterns: "convert 100 usd to inr", "100 dollars in rupees", "$500 in INR", etc.
+    patterns = [
+        r"(\d[\d,]*\.?\d*)\s*(usd|dollar[s]?|\$)\s*(?:to|in|into|=)\s*(inr|rupee[s]?|₹)",
+        r"(\d[\d,]*\.?\d*)\s*(inr|rupee[s]?|₹)\s*(?:to|in|into|=)\s*(usd|dollar[s]?|\$)",
+        r"(\d[\d,]*\.?\d*)\s*(aed|dirham[s]?)\s*(?:to|in|into|=)\s*(inr|rupee[s]?|₹)",
+        r"(\d[\d,]*\.?\d*)\s*(inr|rupee[s]?|₹)\s*(?:to|in|into|=)\s*(aed|dirham[s]?)",
+        r"(\d[\d,]*\.?\d*)\s*(usd|dollar[s]?|\$)\s*(?:to|in|into|=)\s*(aed|dirham[s]?)",
+        r"(\d[\d,]*\.?\d*)\s*(aed|dirham[s]?)\s*(?:to|in|into|=)\s*(usd|dollar[s]?|\$)",
+        r"convert\s+(\d[\d,]*\.?\d*)\s*(usd|inr|aed|dollar[s]?|rupee[s]?|dirham[s]?)\s+(?:to|into)\s+(usd|inr|aed|dollar[s]?|rupee[s]?|dirham[s]?)",
+    ]
+
+    sym_map = {
+        "usd": "USD", "dollar": "USD", "dollars": "USD", "$": "USD",
+        "inr": "INR", "rupee": "INR", "rupees": "INR", "₹": "INR",
+        "aed": "AED", "dirham": "AED", "dirhams": "AED",
+    }
+
+    for pattern in patterns:
+        m = re.search(pattern, msg_lower)
+        if m:
+            groups = m.groups()
+            amount_str = groups[0].replace(",", "")
+            from_raw   = groups[1]
+            to_raw     = groups[2]
+            try:
+                amount = float(amount_str)
+                from_c = sym_map.get(from_raw, from_raw.upper())
+                to_c   = sym_map.get(to_raw,   to_raw.upper())
+                result = currency_convert(amount, from_c, to_c)
+                if "error" not in result:
+                    return (
+                        f"CURRENCY CONVERSION RESULT (pre-computed for accuracy):\n"
+                        f"{format_conversion_reply(result, lang)}\n"
+                        "Include this exact conversion in your reply."
+                    )
+            except ValueError:
+                pass
+
+    return "No currency conversion detected in this message."
 
 
 def _chat_trip_context(
@@ -275,69 +407,70 @@ def _chat_trip_context(
 
 
 def _parse_chat_result(raw_response: str) -> Dict[str, Any]:
-    """Parse and validate the model's required JSON response."""
+    """Parse Gemini's response – handles JSON, markdown-fenced JSON, and plain text fallback."""
+    cleaned = raw_response.strip()
+
+    # Strip markdown code fences (```json ... ``` or ``` ... ```)
+    if cleaned.startswith("```"):
+        lines = cleaned.split("\n")
+        lines = [ln for ln in lines if not ln.strip().startswith("```")]
+        cleaned = "\n".join(lines).strip()
+
+    # Try to find and parse a JSON object
+    result = None
     try:
-        json_start = raw_response.index("{")
-        result, _ = json.JSONDecoder().raw_decode(raw_response[json_start:])
-    except (ValueError, json.JSONDecodeError) as exc:
-        raise LLMInvalidResponseError(
-            "Gemini returned an invalid chat response. Please try again."
-        ) from exc
+        brace_start = cleaned.index("{")
+        result, _ = json.JSONDecoder().raw_decode(cleaned[brace_start:])
+    except (ValueError, json.JSONDecodeError):
+        result = None
 
-    if not isinstance(result, dict):
-        raise LLMInvalidResponseError("Gemini returned an invalid chat response.")
-    reply = result.get("reply")
-    if not isinstance(reply, str) or not reply.strip():
-        raise LLMInvalidResponseError("Gemini returned an empty chat answer.")
-    if "updated_plan" not in result:
-        raise LLMInvalidResponseError(
-            "Gemini did not return the required itinerary update field."
-        )
+    # If JSON has a valid 'reply' field, use it with optional updated_plan validation
+    if isinstance(result, dict) and isinstance(result.get("reply"), str) and result["reply"].strip():
+        reply = result["reply"].strip()
+        changes = result.get("updated_plan", None)
 
-    changes = result["updated_plan"]
-    if changes is not None:
-        if not isinstance(changes, dict):
-            raise LLMInvalidResponseError("Gemini returned an invalid itinerary update.")
-        allowed_fields = {
-            "destination", "duration_days", "budget", "travelers",
-            "weather_summary", "hotels", "budget_breakdown",
-            "daily_itinerary", "final_report"
-        }
-        if not changes or set(changes) - allowed_fields:
-            raise LLMInvalidResponseError("Gemini returned an invalid itinerary update.")
-        if "destination" in changes and (
-            not isinstance(changes["destination"], str) or not changes["destination"].strip()
-        ):
-            raise LLMInvalidResponseError("Gemini returned an invalid destination.")
-        if "duration_days" in changes and (
-            isinstance(changes["duration_days"], bool)
-            or not isinstance(changes["duration_days"], int)
-            or not 1 <= changes["duration_days"] <= 14
-        ):
-            raise LLMInvalidResponseError("Gemini returned an invalid trip duration.")
-        if "budget" in changes and not _is_valid_budget(changes["budget"]):
-            raise LLMInvalidResponseError("Gemini returned an invalid trip budget.")
-        if "travelers" in changes and (
-            isinstance(changes["travelers"], bool)
-            or not isinstance(changes["travelers"], int)
-            or changes["travelers"] < 1
-        ):
-            raise LLMInvalidResponseError("Gemini returned an invalid traveler count.")
-        if "weather_summary" in changes and not isinstance(changes["weather_summary"], dict):
-            raise LLMInvalidResponseError("Gemini returned invalid weather information.")
-        if "hotels" in changes and (
-            not isinstance(changes["hotels"], list)
-            or any(not isinstance(hotel, dict) for hotel in changes["hotels"])
-        ):
-            raise LLMInvalidResponseError("Gemini returned invalid hotel recommendations.")
-        if "budget_breakdown" in changes and not isinstance(changes["budget_breakdown"], dict):
-            raise LLMInvalidResponseError("Gemini returned an invalid budget breakdown.")
-        if "daily_itinerary" in changes and not _is_valid_itinerary(changes["daily_itinerary"]):
-            raise LLMInvalidResponseError("Gemini returned an invalid daily itinerary.")
-        if "final_report" in changes and not isinstance(changes["final_report"], str):
-            raise LLMInvalidResponseError("Gemini returned an invalid itinerary summary.")
+        # Validate updated_plan only if it is non-null
+        if changes is not None:
+            if not isinstance(changes, dict):
+                changes = None  # ignore bad update, keep the reply
+            else:
+                allowed_fields = {
+                    "destination", "duration_days", "budget", "travelers",
+                    "weather_summary", "hotels", "budget_breakdown",
+                    "daily_itinerary", "final_report"
+                }
+                bad_keys = set(changes) - allowed_fields
+                if bad_keys or not changes:
+                    changes = None  # ignore bad update, keep the reply
+                else:
+                    if "destination" in changes and (
+                        not isinstance(changes["destination"], str) or not changes["destination"].strip()
+                    ):
+                        changes = None
+                    if changes and "duration_days" in changes and (
+                        isinstance(changes["duration_days"], bool)
+                        or not isinstance(changes["duration_days"], int)
+                        or not 1 <= changes["duration_days"] <= 14
+                    ):
+                        changes = None
+                    if changes and "budget" in changes and not _is_valid_budget(changes["budget"]):
+                        changes = None
+                    if changes and "travelers" in changes and (
+                        isinstance(changes["travelers"], bool)
+                        or not isinstance(changes["travelers"], int)
+                        or changes["travelers"] < 1
+                    ):
+                        changes = None
 
-    return {"reply": reply.strip(), "updated_plan": changes}
+        return {"reply": reply, "updated_plan": changes}
+
+    # Fallback: treat the whole response as a plain-text reply (Gemini ignored the JSON format)
+    if cleaned and len(cleaned) > 3:
+        return {"reply": cleaned, "updated_plan": None}
+
+    raise LLMInvalidResponseError(
+        "Gemini returned an empty response. Please rephrase your message and try again."
+    )
 
 
 def _is_valid_itinerary(itinerary: Any) -> bool:

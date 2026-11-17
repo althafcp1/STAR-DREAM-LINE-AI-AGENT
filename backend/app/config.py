@@ -34,6 +34,9 @@ class Settings:
         self.GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
         self.GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 
+        # Currency API
+        self.EXCHANGERATE_API_KEY: str = os.getenv("EXCHANGERATE_API_KEY", "")
+
         # External API Keys
         self.OPENWEATHER_API_KEY: str = os.getenv("OPENWEATHER_API_KEY", "")
         self.GOOGLE_MAPS_API_KEY: str = os.getenv("GOOGLE_MAPS_API_KEY", "")

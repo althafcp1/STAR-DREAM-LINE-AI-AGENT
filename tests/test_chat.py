@@ -145,11 +145,12 @@ class TestChatIntegration(unittest.TestCase):
         self.assertIn("GEMINI_API_KEY", raised.exception.detail)
 
     def test_invalid_model_payload_is_not_presented_as_an_answer(self):
-        with patch("app.main.llm_service.generate", return_value="not valid JSON"):
+        # With the new robust parser, a plain-text response is accepted as a reply.
+        # An empty response (or whitespace only) should raise 502.
+        with patch("app.main.llm_service.generate", return_value="   "):
             with self.assertRaises(HTTPException) as raised:
                 main.chat_with_agent(ChatRequest(message="Hi"))
         self.assertEqual(raised.exception.status_code, 502)
-        self.assertIn("invalid chat response", raised.exception.detail)
 
     def test_missing_key_requires_configuration_and_labels_offline_demo(self):
         service = GeminiLLMService(api_key="your_missing_key")

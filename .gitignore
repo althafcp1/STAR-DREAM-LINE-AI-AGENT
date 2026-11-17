@@ -1,3 +1,4 @@
+
 # ── Python ──────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
@@ -9,31 +10,37 @@ dist/
 build/
 .eggs/
 
-# ── Virtual environments ─────────────────────────────────────────
+# ── Virtual environments ────────────────────────────────────────
 .venv/
 venv/
 env/
 ENV/
 
-# ── Environment & secrets – NEVER commit these ───────────────────
+# ── Environment & secrets – NEVER commit these ──────────────────
 .env
 .env.*
 *.env
 backend/.env
+
+# Allow example environment files (placeholders only)
+!.env.example
 !backend/.env.example
 
-# ── Database files ───────────────────────────────────────────────
+# ── Database files ──────────────────────────────────────────────
 *.db
 *.sqlite
 *.sqlite3
 travel_planner.db
 
-# ── Logs ─────────────────────────────────────────────────────────
+# ── Runtime memory and temporary data ───────────────────────────
+travel_agent_memory.json
+
+# ── Logs ────────────────────────────────────────────────────────
 *.log
 phase8_*.log
 agent_safety_audit.log
 
-# ── IDE & editor ─────────────────────────────────────────────────
+# ── IDE & editor ────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
@@ -41,19 +48,19 @@ agent_safety_audit.log
 .DS_Store
 Thumbs.db
 
-# ── Testing & coverage ───────────────────────────────────────────
+# ── Testing & coverage ──────────────────────────────────────────
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 
-# ── Docker ───────────────────────────────────────────────────────
-# (Dockerfile and docker-compose.yml are intentionally committed)
+# ── Docker ──────────────────────────────────────────────────────
+# Dockerfile and docker-compose.yml are intentionally committed
 
-# ── Node (if any frontend tooling is added) ──────────────────────
+# ── Node ────────────────────────────────────────────────────────
 node_modules/
 npm-debug.log*
 
-# ── Render / deployment temp files ──────────────────────────────
+# ── Render / deployment temporary files ────────────────────────
 .render-build/
 

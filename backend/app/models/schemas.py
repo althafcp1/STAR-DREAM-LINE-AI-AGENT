@@ -37,6 +37,7 @@ class ChatRequest(BaseModel):
     user_id: str = "guest_user"
     destination: str = "Tokyo"
     duration_days: int = 3
+    language: Optional[str] = Field("en", description="'en' for English, 'ar' for Arabic")
     message: str = Field(
         ...,
         min_length=1,
