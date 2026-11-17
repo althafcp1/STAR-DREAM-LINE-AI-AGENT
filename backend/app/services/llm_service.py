@@ -33,16 +33,23 @@ class LLMInvalidResponseError(LLMServiceError):
 class GeminiLLMService:
     """Client for Gemini's generateContent API."""
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-3.8-flash"):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
-        self.model = model
+        # Sanitize model name - strip whitespace and any leading 'models/' prefix if present
+        clean_model = (model or "gemini-3.8-flash").strip()
+        if clean_model.startswith("models/"):
+            clean_model = clean_model[len("models/"):]
+        if not clean_model or clean_model.startswith("YOUR_") or clean_model.startswith("your_"):
+            clean_model = "gemini-3.8-flash"
+        self.model = clean_model
         self.api_url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/"
             f"{self.model}:generateContent"
         )
 
     def is_configured(self) -> bool:
-        return bool(self.api_key and not self.api_key.startswith("your_"))
+        key = (self.api_key or "").strip()
+        return bool(key and not key.startswith("your_") and not key.startswith("YOUR_"))
 
     def generate(
         self,
@@ -80,21 +87,39 @@ class GeminiLLMService:
                         "Gemini returned an unreadable response."
                     ) from exc
         except urllib.error.HTTPError as exc:
+            # Safely read error body from provider without leaking secrets
+            error_body = ""
+            error_detail = ""
+            try:
+                error_body = exc.read().decode("utf-8")
+                err_json = json.loads(error_body)
+                if isinstance(err_json, dict) and "error" in err_json:
+                    error_detail = err_json["error"].get("message", "")
+            except Exception:
+                pass
+
+            if exc.code == 404:
+                msg = f"Gemini model '{self.model}' not found (HTTP 404)."
+                if error_detail:
+                    msg += f" Details: {error_detail}"
+                raise LLMConfigurationError(msg) from exc
             if exc.code == 429:
                 raise LLMRateLimitError(
                     "Gemini is rate-limiting requests. Please wait and try again."
                 ) from exc
             if exc.code in (401, 403):
-                raise LLMConfigurationError(
-                    "Gemini rejected the API key. Check GEMINI_API_KEY and its permissions."
-                ) from exc
+                msg = "Gemini rejected the API key. Check GEMINI_API_KEY and its permissions."
+                if error_detail:
+                    msg += f" Details: {error_detail}"
+                raise LLMConfigurationError(msg) from exc
             if exc.code in (408, 504):
                 raise LLMTimeoutError(
                     "Gemini timed out. Please try again."
                 ) from exc
-            raise LLMServiceError(
-                f"Gemini request failed with HTTP {exc.code}."
-            ) from exc
+            error_msg = f"Gemini request failed with HTTP {exc.code}."
+            if error_detail:
+                error_msg += f" Details: {error_detail}"
+            raise LLMServiceError(error_msg) from exc
         except (TimeoutError, socket.timeout) as exc:
             raise LLMTimeoutError(
                 "Gemini timed out. Please try again."

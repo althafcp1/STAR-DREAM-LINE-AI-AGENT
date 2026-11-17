@@ -88,16 +88,36 @@ def health_check():
 
 @app.get("/api/check-key")
 def check_api_key():
-    """Diagnostic: check whether Gemini API key is loaded (never exposes the key value)."""
+    """Diagnostic: check whether Gemini API key is loaded and model configured (never exposes keys)."""
     configured = llm_service.is_configured()
     return {
         "gemini_configured": configured,
+        "gemini_model": llm_service.model,
         "message": (
-            "Gemini API key is loaded and ready." if configured
+            f"Gemini API key is loaded. Configured model: '{llm_service.model}'." if configured
             else "GEMINI_API_KEY is not set or still a placeholder. "
-                 "Edit backend/.env and add your real API key from https://aistudio.google.com/app/apikey"
+                 "Edit backend/.env and add your real API key from https://aistudio.google.com/apikey"
         )
     }
+
+
+@app.get("/api/test-gemini")
+def test_gemini_connection():
+    """Minimal live Gemini connection test using the configured model."""
+    if not llm_service.is_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Gemini is not configured. Set a valid GEMINI_API_KEY in backend/.env or environment."
+        )
+    try:
+        reply = llm_service.generate("Reply with 'pong' if you hear me.", allow_offline_fallback=False)
+        return {
+            "status": "success",
+            "model": llm_service.model,
+            "response": reply
+        }
+    except LLMServiceError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
 
 
 @app.get("/api/currency/rates")

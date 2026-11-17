@@ -32,7 +32,11 @@ class Settings:
 
         # LLM Settings
         self.GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-        self.GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+        raw_model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
+        # Fall back to default if model is placeholder or empty
+        if not raw_model or raw_model.startswith("YOUR_") or raw_model.startswith("your_"):
+            raw_model = "gemini-3.8-flash"
+        self.GEMINI_MODEL: str = raw_model
 
         # Currency API
         self.EXCHANGERATE_API_KEY: str = os.getenv("EXCHANGERATE_API_KEY", "")

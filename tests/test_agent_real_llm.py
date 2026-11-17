@@ -30,7 +30,7 @@ class TestAgentWithRealLLM(unittest.TestCase):
     def test_real_llm_service_initialization(self):
         """Verify LLM service provider configures correctly."""
         self.assertIsNotNone(self.llm_service)
-        self.assertEqual(self.llm_service.model, "gemini-1.5-flash")
+        self.assertEqual(self.llm_service.model, "gemini-3.8-flash")
 
     def test_real_llm_agent_pipeline_execution(self):
         """
