@@ -1,0 +1,59 @@
+# ── Python ──────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ─────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Environment & secrets – NEVER commit these ───────────────────
+.env
+.env.*
+*.env
+backend/.env
+!backend/.env.example
+
+# ── Database files ───────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+travel_planner.db
+
+# ── Logs ─────────────────────────────────────────────────────────
+*.log
+phase8_*.log
+agent_safety_audit.log
+
+# ── IDE & editor ─────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Testing & coverage ───────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ── Docker ───────────────────────────────────────────────────────
+# (Dockerfile and docker-compose.yml are intentionally committed)
+
+# ── Node (if any frontend tooling is added) ──────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Render / deployment temp files ──────────────────────────────
+.render-build/
+
