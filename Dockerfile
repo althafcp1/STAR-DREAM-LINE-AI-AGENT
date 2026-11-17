@@ -1,38 +1,61 @@
+
 # syntax=docker/dockerfile:1
 
-# ---------- Build stage (backend) ----------
+# ============================================================
+# STAGE 1: BACKEND DEPENDENCIES AND SOURCE
+# ============================================================
 FROM python:3.11-slim AS backend-builder
-WORKDIR /app
-# Install build dependencies
-COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-# Copy backend source
-COPY backend/ ./
-# Copy config and .env example
-COPY backend/app/config.py ./backend/app/
-COPY backend/.env.example ./backend/.env.example
 
-# ---------- Build stage (frontend) ----------
+WORKDIR /app
+
+# Install Python dependencies
+COPY backend/requirements.txt ./requirements.txt
+
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Copy backend source code
+COPY backend/ ./backend/
+
+# ============================================================
+# STAGE 2: FRONTEND
+# ============================================================
 FROM node:18-alpine AS frontend-builder
-WORKDIR /frontend
-COPY frontend/ .
-# Install any build tools if needed (assume static only, skip npm)
-# For a real project you would run npm install && npm run build
-# Here we just copy files
-RUN cp -r . /frontend-built
 
-# ---------- Final image ----------
+WORKDIR /frontend
+
+# Copy frontend source
+COPY frontend/ ./
+
+# Frontend is static HTML, CSS and JavaScript
+RUN mkdir -p /frontend-built && cp -r . /frontend-built/
+
+# ============================================================
+# STAGE 3: FINAL PRODUCTION IMAGE
+# ============================================================
 FROM python:3.11-slim AS final
+
 WORKDIR /app
-# Copy backend built artifacts
-COPY --from=backend-builder /app /app
-# Copy frontend static files into backend static directory
-COPY --from=frontend-builder /frontend-built /app/frontend
-# Expose the FastAPI port
-EXPOSE 8000
-# Runtime environment variables (override in production)
+
+# Install dependencies from backend builder
+COPY --from=backend-builder /install /usr/local
+
+# Copy backend source
+COPY --from=backend-builder /app/backend ./backend
+
+# Copy frontend static files
+COPY --from=frontend-builder /frontend-built ./frontend
+
+# Configure Python
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 ENV APP_ENV=production
 ENV APP_DEBUG=false
-# Start the server
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
+# Render provides the PORT environment variable
+ENV PORT=10000
+
+# Expose default Render port
+EXPOSE 10000
+
+# Start FastAPI application
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
