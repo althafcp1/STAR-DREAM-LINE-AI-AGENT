@@ -807,4 +807,55 @@ document.addEventListener("DOMContentLoaded", () => {
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
+
+  // ── HAMBURGER MENU ──────────────────────────────────────────
+  const navToggle = el("navToggle");
+  const mobileMenu = el("mobileMenu");
+  if (navToggle && mobileMenu) {
+    navToggle.addEventListener("click", () => {
+      const isOpen = mobileMenu.classList.toggle("open");
+      navToggle.classList.toggle("open", isOpen);
+      navToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+    // Close menu when any nav link is clicked
+    mobileMenu.querySelectorAll(".nav-link").forEach(link => {
+      link.addEventListener("click", () => {
+        mobileMenu.classList.remove("open");
+        navToggle.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
+    // Close menu when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!navToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+        mobileMenu.classList.remove("open");
+        navToggle.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  // ── STICKY NAV SCROLL SHADOW ────────────────────────────────
+  const mainNav = el("mainNav");
+  if (mainNav) {
+    window.addEventListener("scroll", () => {
+      mainNav.classList.toggle("scrolled", window.scrollY > 20);
+    }, { passive: true });
+  }
+
+  // ── SCROLL REVEAL ANIMATIONS ────────────────────────────────
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("revealed");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll(".reveal-on-scroll").forEach(el => revealObserver.observe(el));
+  } else {
+    // If reduced motion, just show everything immediately
+    document.querySelectorAll(".reveal-on-scroll").forEach(el => el.classList.add("revealed"));
+  }
 });
