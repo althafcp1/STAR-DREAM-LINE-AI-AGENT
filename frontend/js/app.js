@@ -1,16 +1,17 @@
 /**
- * DreamLine Travels – Frontend Controller v3.0
- * Features: Agency Services, B2B WhatsApp Booking, AI Trip Planner, Gemini Chatbot, Bilingual (EN/AR)
+ * DreamLine AI Agent – Frontend Controller v2.0
+ * Dream Line Travels | Your Intelligent Travel Companion
+ * Features: English/Arabic, Audio, Responsive, Gemini Chat
  */
 
 /* ── STATE ──────────────────────────────────────────────────── */
-let currentTripId        = null;
-let currentDestination   = "Dubai";
-let currentDuration      = 3;
-let currentLang          = "en";           // "en" | "ar"
-let activePlanRequest    = 0;
-let agentTimers          = [];
-let configuredWhatsApp   = "";             // fetched dynamically from /api/config/public or fallback
+let currentTripId     = null;
+let currentDestination = "Dubai";
+let currentDuration   = 3;
+let currentLang       = "en";           // "en" | "ar"
+let activePlanRequest = 0;
+let agentTimers       = [];
+let activeAudio       = null;           // currently playing Audio object
 let speechSynthAvailable = window.speechSynthesis && window.SpeechSynthesisUtterance;
 
 const currentUserId = (() => {
@@ -28,8 +29,8 @@ const currentUserId = (() => {
 /* ── TRANSLATIONS ───────────────────────────────────────────── */
 const T = {
   en: {
-    welcomeMsg:      "Hello! Welcome to DreamLine Travels. I'm your travel assistant. Ask me about UAE visas, flight bookings, Dubai tour packages, Oman border trips or currency conversions! 🌟",
-    typingMsg:       "DreamLine Assistant is thinking...",
+    welcomeMsg:      "Hello! Welcome to Dream Line Travels. I'm DreamLine AI, your personal travel assistant. Ask me about Dubai, Abu Dhabi, hotels, itineraries, or any travel question! 🌟",
+    typingMsg:       "DreamLine AI is thinking...",
     sendBtn:         "Send",
     clearBtn:        "🗑️ Clear",
     langInfo:        "Responding in: English",
@@ -37,18 +38,13 @@ const T = {
     chatHintClose:   "Close",
     errorPrefix:     "Unable to get an AI response",
     retryLabel:      "Retry",
-    chatPlaceholder: "Ask about visas, flights, Dubai packages, currencies...",
+    chatPlaceholder: "Ask about Dubai, hotels, itineraries...",
     noKey:           "⚠️ Gemini AI is not configured. Chat responses will be unavailable until you add your API key to backend/.env.",
-    getKeyLink:      "Get a key here →",
-    planningBtn:     "⏳ Planning your trip itinerary...",
-    generateBtn:     "🚀 Generate Itinerary with AI Planner",
+    getKeyLink:      "Get a free key here →",
+    planningBtn:     "⏳ DreamLine AI is planning your trip...",
+    generateBtn:     "🚀 Generate Itinerary with DreamLine AI",
     noTrip:          "Please generate a trip plan first.",
     invalidForm:     "Please enter valid trip details.",
-    submittingApp:   "Preparing WhatsApp application...",
-    submitAppBtn:    "📲 Submit Application via WhatsApp",
-    waNotConfigured: "⚠️ WhatsApp business number is not configured in backend settings. Please contact DreamLine Travels directly or configure WHATSAPP_BUSINESS_PHONE in backend/.env.",
-    fillRequired:    "Please complete all required fields correctly.",
-    consentRequired: "Please tick the consent box allowing DreamLine Travels to contact you on WhatsApp.",
     agentSteps: [
       ["agent-manager",   "Analyzing trip parameters..."],
       ["agent-dest",      "Researching destinations..."],
@@ -61,8 +57,8 @@ const T = {
     agentWaiting: "Waiting...",
   },
   ar: {
-    welcomeMsg:      "مرحباً بكم في دريم لاين للسفر! أنا مساعدكم السياحي. اسألني عن تأشيرات الإمارات، حجز الطيران، باقات دبي السياحية، رحلات حدود عُمان أو تحويل العملات! 🌟",
-    typingMsg:       "مساعد دريم لاين يفكر...",
+    welcomeMsg:      "مرحباً! أهلاً بك في دريم لاين للسفر. أنا مساعد دريم لاين الذكي للسفر. اسألني عن دبي وأبوظبي والفنادق والبرامج السياحية أو أي سؤال عن السفر! 🌟",
+    typingMsg:       "دريم لاين الذكي يفكر...",
     sendBtn:         "إرسال",
     clearBtn:        "🗑️ مسح",
     langInfo:        "يرد بـ: العربية",
@@ -70,18 +66,13 @@ const T = {
     chatHintClose:   "أغلق",
     errorPrefix:     "تعذّر الحصول على رد الذكاء الاصطناعي",
     retryLabel:      "إعادة المحاولة",
-    chatPlaceholder: "اسأل عن التأشيرات، الطيران، باقات دبي، العملات...",
+    chatPlaceholder: "اسأل عن دبي، الفنادق، البرامج السياحية...",
     noKey:           "⚠️ لم يتم تهيئة Gemini AI. لن تتوفر ردود المحادثة حتى تُضيف مفتاح API إلى backend/.env.",
-    getKeyLink:      "احصل على مفتاح هنا ←",
-    planningBtn:     "⏳ جاري تخطيط البرنامج السياحي...",
-    generateBtn:     "🚀 إنشاء خطة السفر بالذكاء الاصطناعي",
+    getKeyLink:      "احصل على مفتاح مجاني هنا ←",
+    planningBtn:     "⏳ دريم لاين الذكي يخطط رحلتك...",
+    generateBtn:     "🚀 إنشاء برنامج سياحي مع دريم لاين",
     noTrip:          "الرجاء إنشاء خطة سفر أولاً.",
     invalidForm:     "يرجى إدخال تفاصيل رحلة صحيحة.",
-    submittingApp:   "جاري تجهيز الطلب عبر واتساب...",
-    submitAppBtn:    "📲 إرسال الطلب عبر واتساب",
-    waNotConfigured: "⚠️ رقم واتساب الخاص بالوكالة غير مهيأ حالياً في الإعدادات. يرجى التواصل مع دريم لاين للسفر مباشرة أو إدخال WHATSAPP_BUSINESS_PHONE في ملف الإعدادات.",
-    fillRequired:    "يرجى استكمال جميع الحقول الإلزامية بشكل صحيح.",
-    consentRequired: "يرجى الموافقة على مربع الإقرار للتواصل معكم عبر واتساب.",
     agentSteps: [
       ["agent-manager",   "جاري تحليل معلمات الرحلة..."],
       ["agent-dest",      "جاري البحث عن الوجهات..."],
@@ -99,6 +90,7 @@ function t(key) {
   return (T[currentLang] || T.en)[key] || T.en[key] || key;
 }
 
+/* ── DOM HELPERS ────────────────────────────────────────────── */
 function el(id) { return document.getElementById(id); }
 
 function createElement(tag, className, text) {
@@ -128,21 +120,6 @@ async function getApiError(response) {
   return message;
 }
 
-/* ── FETCH PUBLIC SETTINGS ──────────────────────────────────── */
-async function loadPublicConfig() {
-  try {
-    const r = await fetch("/api/config/public");
-    if (r.ok) {
-      const data = await r.json();
-      if (data.whatsapp_phone) {
-        configuredWhatsApp = String(data.whatsapp_phone).replace(/[^0-9]/g, "");
-      }
-    }
-  } catch (err) {
-    console.warn("Could not load public config:", err);
-  }
-}
-
 /* ── LANGUAGE SWITCHER ──────────────────────────────────────── */
 function applyLanguage(lang) {
   currentLang = lang;
@@ -150,60 +127,65 @@ function applyLanguage(lang) {
   html.setAttribute("lang", lang);
   html.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
 
+  // Update all data-en/data-ar elements
   document.querySelectorAll("[data-en]").forEach(node => {
     const val = node.getAttribute(`data-${lang}`) || node.getAttribute("data-en");
     if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
       node.placeholder = val;
     } else {
-      if (!node.querySelector("input, button, select, a, textarea")) {
+      // Only update if the element has no children that shouldn't be overwritten
+      if (!node.querySelector("input, button, select, a")) {
         node.textContent = val;
       }
     }
   });
 
+  // Update select option text
   document.querySelectorAll("option[data-en]").forEach(opt => {
     const val = opt.getAttribute(`data-${lang}`) || opt.getAttribute("data-en");
     if (val) opt.textContent = val;
   });
 
+  // Update chat input placeholder
   const chatInputEl = el("chatInput");
   if (chatInputEl) chatInputEl.placeholder = t("chatPlaceholder");
 
+  // Update send button
   const sendBtnEl = el("sendChatBtn");
   if (sendBtnEl) {
     const span = sendBtnEl.querySelector("span[data-en]") || sendBtnEl;
     span.textContent = t("sendBtn");
   }
 
+  // Update clear button
   const clearBtnEl = el("clearChatBtn");
   if (clearBtnEl) clearBtnEl.textContent = t("clearBtn");
 
+  // Update lang info
   const langInfoEl = el("chatLangInfo");
   if (langInfoEl) langInfoEl.textContent = t("langInfo");
 
+  // Update generate button
   const generateBtnEl = el("generatePlanBtn");
   if (generateBtnEl && !generateBtnEl.disabled) {
     const span = generateBtnEl.querySelector("span[data-en]") || generateBtnEl;
     span.textContent = t("generateBtn");
   }
 
-  const submitAppBtnEl = el("btnSubmitApplication");
-  if (submitAppBtnEl && !submitAppBtnEl.disabled) {
-    const span = submitAppBtnEl.querySelector("span[data-en]") || submitAppBtnEl;
-    span.textContent = t("submitAppBtn");
-  }
-
+  // Update chat hint
   const chatHintEl = document.querySelector(".chat-hint");
   if (chatHintEl) {
     const isOpen = el("chatDrawer") && !el("chatDrawer").classList.contains("collapsed");
     chatHintEl.textContent = isOpen ? t("chatHintClose") : t("chatHintOpen");
   }
 
+  // Update API warning text if visible
   const apiWarningEl = el("apiWarningText");
   if (apiWarningEl) {
-    apiWarningEl.innerHTML = `${t("noKey")} <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">${t("getKeyLink")}</a>`;
+    apiWarningEl.innerHTML = `${t("noKey")} <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">${t("getKeyLink")}</a>`;
   }
 
+  // Update lang buttons
   document.querySelectorAll(".lang-btn").forEach(btn => {
     const isActive = btn.dataset.lang === lang;
     btn.classList.toggle("active", isActive);
@@ -211,167 +193,7 @@ function applyLanguage(lang) {
   });
 }
 
-/* ── PROMPT 4: B2B WHATSAPP BOOKING APPLICATION ──────────────── */
-function initB2BApplicationForm() {
-  const form = el("b2bApplicationForm");
-  if (!form) return;
-
-  // Pre-fill required service if "Apply Now" clicked on a specific service card
-  document.querySelectorAll(".btn-service-apply").forEach(btn => {
-    btn.addEventListener("click", e => {
-      const serviceName = btn.getAttribute("data-service");
-      const serviceSelect = el("b2bServiceRequired");
-      if (serviceSelect && serviceName) {
-        if (serviceName.includes("Visa")) {
-          serviceSelect.value = "UAE Visa Renewal Assistance";
-        } else if (serviceName.includes("Oman") || serviceName.includes("Border")) {
-          serviceSelect.value = "Oman Border Trip";
-        } else {
-          serviceSelect.value = "Other Visa Assistance";
-        }
-      }
-    });
-  });
-
-  form.addEventListener("submit", async e => {
-    e.preventDefault();
-
-    const errFullName        = el("errFullName");
-    const errWhatsapp        = el("errWhatsapp");
-    const errNationality     = el("errNationality");
-    const errCurrentLocation = el("errCurrentLocation");
-    const errPickupLocation  = el("errPickupLocation");
-    const errVisaExpiry      = el("errVisaExpiry");
-    const errAdults          = el("errAdults");
-    const errConsent         = el("errConsent");
-    const alertBox           = el("whatsappStatusAlert");
-
-    // Reset errors
-    [errFullName, errWhatsapp, errNationality, errCurrentLocation, errPickupLocation, errVisaExpiry, errAdults, errConsent].forEach(div => {
-      if (div) div.textContent = "";
-    });
-    form.querySelectorAll(".form-control").forEach(inp => inp.classList.remove("is-invalid"));
-    if (alertBox) alertBox.style.display = "none";
-
-    // Gather values
-    const fullName        = el("b2bFullName").value.trim();
-    const whatsappNum     = el("b2bWhatsapp").value.trim();
-    const nationality     = el("b2bNationality").value.trim();
-    const currentLocation = el("b2bCurrentLocation").value.trim();
-    const pickupLocation  = el("b2bPickupLocation").value;
-    const visaExpiry      = el("b2bVisaExpiry").value;
-    const adultsCount     = parseInt(el("b2bAdults").value, 10);
-    const childrenCount   = parseInt(el("b2bChildren").value || "0", 10);
-    const serviceReq      = el("b2bServiceRequired").value;
-    const accommodation   = el("b2bAccommodation").value;
-    const foodReq         = el("b2bFood").value;
-    const notes           = el("b2bNotes").value.trim();
-    const consent         = el("b2bConsent").checked;
-
-    let hasError = false;
-
-    if (!fullName) {
-      el("b2bFullName").classList.add("is-invalid");
-      if (errFullName) errFullName.textContent = currentLang === "ar" ? "يرجى إدخال الاسم الكامل" : "Please enter full name.";
-      hasError = true;
-    }
-
-    if (!whatsappNum || whatsappNum.length < 7) {
-      el("b2bWhatsapp").classList.add("is-invalid");
-      if (errWhatsapp) errWhatsapp.textContent = currentLang === "ar" ? "يرجى إدخال رقم واتساب صحيح" : "Please enter a valid WhatsApp phone number.";
-      hasError = true;
-    }
-
-    if (!nationality) {
-      el("b2bNationality").classList.add("is-invalid");
-      if (errNationality) errNationality.textContent = currentLang === "ar" ? "يرجى تحديد الجنسية" : "Please specify nationality.";
-      hasError = true;
-    }
-
-    if (!currentLocation) {
-      el("b2bCurrentLocation").classList.add("is-invalid");
-      if (errCurrentLocation) errCurrentLocation.textContent = currentLang === "ar" ? "يرجى تحديد مكان الإقامة الحالي" : "Please enter current UAE location.";
-      hasError = true;
-    }
-
-    if (!pickupLocation) {
-      el("b2bPickupLocation").classList.add("is-invalid");
-      if (errPickupLocation) errPickupLocation.textContent = currentLang === "ar" ? "يرجى اختيار نقطة الانطلاق المفضلة" : "Please select preferred pickup location.";
-      hasError = true;
-    }
-
-    if (!visaExpiry) {
-      el("b2bVisaExpiry").classList.add("is-invalid");
-      if (errVisaExpiry) errVisaExpiry.textContent = currentLang === "ar" ? "يرجى تحديد تاريخ انتهاء التأشيرة" : "Please specify visa expiry date.";
-      hasError = true;
-    }
-
-    if (!adultsCount || adultsCount < 1) {
-      el("b2bAdults").classList.add("is-invalid");
-      if (errAdults) errAdults.textContent = currentLang === "ar" ? "عدد البالغين يجب أن يكون 1 على الأقل" : "At least 1 adult passenger required.";
-      hasError = true;
-    }
-
-    if (!consent) {
-      if (errConsent) errConsent.textContent = t("consentRequired");
-      hasError = true;
-    }
-
-    if (hasError) return;
-
-    // Check configured WhatsApp phone number
-    if (!configuredWhatsApp) {
-      await loadPublicConfig();
-    }
-
-    if (!configuredWhatsApp) {
-      if (alertBox) {
-        alertBox.className = "whatsapp-alert-box warn";
-        alertBox.style.display = "block";
-        alertBox.innerHTML = `<strong>⚠️ Notice:</strong> ${t("waNotConfigured")}`;
-      }
-      return;
-    }
-
-    // Build formatted message for WhatsApp
-    const lines = [
-      `*DREAMLINE TRAVELS - B2B SERVICE APPLICATION*`,
-      `---------------------------------------`,
-      `👤 *Full Name:* ${fullName}`,
-      `📞 *Client WhatsApp:* ${whatsappNum}`,
-      `🌍 *Nationality:* ${nationality}`,
-      `📍 *Current UAE Location:* ${currentLocation}`,
-      `🚌 *Preferred Pickup:* ${pickupLocation}`,
-      `📅 *Visa Expiry Date:* ${visaExpiry}`,
-      `👥 *Passengers:* ${adultsCount} Adult(s), ${childrenCount} Child(ren)`,
-      `📌 *Required Service:* ${serviceReq}`,
-      `🏨 *Accommodation Required:* ${accommodation}`,
-      `🍽️ *Food Required:* ${foodReq}`,
-      notes ? `📝 *Additional Notes:* ${notes}` : null,
-      `---------------------------------------`,
-      `_Application prepared via DreamLine Travels Portal._`
-    ].filter(Boolean);
-
-    const messageText = lines.join("\n");
-    const encodedMsg = encodeURIComponent(messageText);
-    const waUrl = `https://wa.me/${configuredWhatsApp}?text=${encodedMsg}`;
-
-    if (alertBox) {
-      alertBox.className = "whatsapp-alert-box info";
-      alertBox.style.display = "block";
-      alertBox.textContent = currentLang === "ar"
-        ? "✅ تم تجهيز طلبك بنجاح! سيتم فتح واتساب الآن لمراجعة الطلب وإرساله."
-        : "✅ Application summary prepared! Opening WhatsApp so you can review and send...";
-    }
-
-    // Open WhatsApp in new tab/window for manual transmission
-    setTimeout(() => {
-      window.open(waUrl, "_blank", "noopener,noreferrer");
-    }, 400);
-  });
-}
-
-/* ── API KEY STATUS CHECK ───────────────────────────────────── */
+/* ── API KEY CHECK ──────────────────────────────────────────── */
 async function checkApiKeyStatus() {
   try {
     const r = await fetch("/api/check-key");
@@ -384,7 +206,7 @@ async function checkApiKeyStatus() {
   } catch { /* server might not be running; ignore */ }
 }
 
-/* ── CHAT SYSTEM (PRESERVED) ────────────────────────────────── */
+/* ── CHAT ───────────────────────────────────────────────────── */
 const chatMessages = el("chatMessages");
 
 function appendChatBubble(role, message, extraClass = "", withAudio = false) {
@@ -416,34 +238,31 @@ function appendChatBubble(role, message, extraClass = "", withAudio = false) {
 function appendTypingIndicator() {
   const indicator = appendChatBubble("assistant", t("typingMsg"), "typing-indicator");
   indicator.setAttribute("aria-label", t("typingMsg"));
-  return indicator.parentElement;
+  return indicator.parentElement; // return the wrap div
 }
 
 function clearChat() {
   while (chatMessages.firstChild) {
     chatMessages.removeChild(chatMessages.firstChild);
   }
+  // Re-add welcome message
   appendChatBubble("assistant", t("welcomeMsg"), "", false);
 }
 
+/* ── SPEECH SYNTHESIS (Audio) ───────────────────────────────── */
 function speakMessage(text, btnEl) {
   if (!speechSynthAvailable) {
-    appendChatBubble(
-      "assistant",
-      currentLang === "ar"
-        ? "متصفحك لا يدعم التحدث الآلي. يرجى استخدام متصفح حديث."
-        : "Your browser does not support speech synthesis. Please use a modern browser.",
-      "error"
-    );
+    showAudioFallbackMessage();
     return;
   }
 
+  // Stop any currently playing audio
   if (window.speechSynthesis.speaking) {
     window.speechSynthesis.cancel();
     document.querySelectorAll(".audio-btn.playing").forEach(b => b.classList.remove("playing"));
     if (btnEl.classList.contains("playing")) {
       btnEl.classList.remove("playing");
-      return;
+      return; // toggle off
     }
   }
 
@@ -452,6 +271,7 @@ function speakMessage(text, btnEl) {
   utterance.rate   = 0.95;
   utterance.pitch  = 1.0;
 
+  // Try to pick a matching voice
   const voices = window.speechSynthesis.getVoices();
   const langCode = currentLang === "ar" ? "ar" : "en";
   const matchVoice = voices.find(v => v.lang.startsWith(langCode) && !v.name.includes("Google"));
@@ -474,6 +294,17 @@ function speakMessage(text, btnEl) {
   window.speechSynthesis.speak(utterance);
 }
 
+function showAudioFallbackMessage() {
+  appendChatBubble(
+    "assistant",
+    currentLang === "ar"
+      ? "متصفحك لا يدعم التحدث الآلي. يرجى استخدام متصفح حديث."
+      : "Your browser does not support speech synthesis. Please use a modern browser.",
+    "error"
+  );
+}
+
+/* ── SEND CHAT MESSAGE ──────────────────────────────────────── */
 async function sendChatMessage() {
   const chatInputEl   = el("chatInput");
   const sendChatBtnEl = el("sendChatBtn");
@@ -529,6 +360,7 @@ async function sendChatMessage() {
     const errMsg = `${t("errorPrefix")}: ${error.message}`;
     const errBubble = appendChatBubble("assistant", errMsg, "error");
 
+    // Add retry button
     const retryBtn = document.createElement("button");
     retryBtn.className = "chat-tool-btn";
     retryBtn.style.cssText = "margin-top:8px; display:block; font-size:12px;";
@@ -550,7 +382,7 @@ async function sendChatMessage() {
   }
 }
 
-/* ── AGENT TRACKER (PRESERVED) ───────────────────────────────── */
+/* ── AGENT TRACKER ──────────────────────────────────────────── */
 function clearAgentTimers() {
   agentTimers.forEach(clearTimeout);
   agentTimers = [];
@@ -587,7 +419,7 @@ function completeAllAgents() {
   });
 }
 
-/* ── DASHBOARD RENDER (PRESERVED) ───────────────────────────── */
+/* ── DASHBOARD RENDER ───────────────────────────────────────── */
 function renderDashboard(data) {
   setText(
     "resDestTitle",
@@ -597,6 +429,7 @@ function renderDashboard(data) {
   setText("resBudgetVal",    formatMoney(data.budget));
   setText("resTravelersVal", `${data.travelers ?? "—"} Guests`);
 
+  // WEATHER
   const weather     = data.weather_summary || {};
   const temperature = weather.temperature_celsius;
   const weatherText = temperature != null
@@ -605,11 +438,13 @@ function renderDashboard(data) {
   setText("resWeatherVal",      weatherText);
   setText("resWeatherAdvisory", weather.travel_advisory || "No advisory available.");
 
+  // BUDGET
   const budget = data.budget_breakdown || {};
   setText("resFoodVal",    formatMoney(budget.estimated_food_total_usd));
   setText("resTransitVal", formatMoney(budget.estimated_local_transit_usd));
   setText("resBufferVal",  formatMoney(budget.emergency_buffer_usd));
 
+  // HOTELS
   const hotelsContainer = el("resHotelsList");
   hotelsContainer.replaceChildren();
   const hotels = Array.isArray(data.hotels) ? data.hotels : [];
@@ -629,6 +464,7 @@ function renderDashboard(data) {
     hotelsContainer.appendChild(card);
   });
 
+  // ITINERARY
   const timeline = el("resTimeline");
   timeline.replaceChildren();
   const days = Array.isArray(data.daily_itinerary) ? data.daily_itinerary : [];
@@ -655,7 +491,7 @@ function renderDashboard(data) {
   });
 }
 
-/* ── TRIP PLANNING SUBMIT (PRESERVED) ───────────────────────── */
+/* ── TRIP PLANNING ──────────────────────────────────────────── */
 async function handleTripSubmit(event) {
   event.preventDefault();
 
@@ -737,18 +573,13 @@ async function handleTripSubmit(event) {
   }
 }
 
-/* ── DOM READY BOOTSTRAP ────────────────────────────────────── */
+/* ── BOOT ───────────────────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
-  // Load public config (WhatsApp contact, etc.)
-  loadPublicConfig();
 
   // Language buttons
   document.querySelectorAll(".lang-btn").forEach(btn => {
     btn.addEventListener("click", () => applyLanguage(btn.dataset.lang));
   });
-
-  // Initialize B2B Application Form
-  initB2BApplicationForm();
 
   // Trip form
   const tripFormEl = el("tripFormEl");
@@ -796,13 +627,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial welcome message
   appendChatBubble("assistant", t("welcomeMsg"), "", false);
 
-  // Apply default language
+  // Apply default language (English)
   applyLanguage("en");
 
-  // Check key status
+  // Check if Gemini is configured and show warning if not
   checkApiKeyStatus();
 
-  // Preload speech synthesis
+  // Pre-load speech synthesis voices (some browsers load lazily)
   if (window.speechSynthesis) {
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
