@@ -564,6 +564,16 @@ def _apply_chat_plan_update(
     return updated
 
 
+@app.get("/api/config/public")
+def get_public_config():
+    """Return public agency settings such as configured WhatsApp contact number."""
+    return {
+        "agency_name": "DreamLine Travels",
+        "whatsapp_phone": settings.WHATSAPP_BUSINESS_PHONE.strip(),
+        "whatsapp_configured": bool(settings.WHATSAPP_BUSINESS_PHONE.strip())
+    }
+
+
 # Mount static frontend directory if present
 FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
 if os.path.exists(FRONTEND_DIR):

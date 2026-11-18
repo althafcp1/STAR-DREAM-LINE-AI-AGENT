@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#12172E">
-  <title>Dream Line Travels | DreamLine AI Travel Assistant</title>
+  <title>DreamLine Travels | UAE Visas, Flights & Complete Travel Solutions</title>
   <link rel="icon" type="image/png" href="/static/assets/dreamline-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,20 +21,23 @@
       <div class="brand-logo-wrap">
         <img
           src="/static/assets/dreamline-logo.png"
-          alt="Dream Line Travels Logo"
+          alt="DreamLine Travels Logo"
           class="brand-logo"
           onerror="this.style.display='none'; this.parentElement.innerHTML='✈️';"
         >
       </div>
       <div class="brand-text">
-        <span class="brand-name" data-en="DreamLine AI Agent" data-ar="وكيل دريم لاين الذكي">DreamLine AI Agent</span>
-        <span class="brand-sub" data-en="Powered by Dream Line Travels" data-ar="من تقديم دريم لاين للسفر">Powered by Dream Line Travels</span>
+        <span class="brand-name" data-en="DreamLine Travels" data-ar="دريم لاين للسفر">DreamLine Travels</span>
+        <span class="brand-sub" data-en="Your Trusted Travel Partner" data-ar="شريككم الموثوق في السفر والسياحة">Your Trusted Travel Partner</span>
       </div>
     </a>
 
     <nav class="nav-links" aria-label="Main navigation">
       <a href="#" class="nav-link" data-en="Home" data-ar="الرئيسية">Home</a>
-      <a href="#tripForm" class="nav-link" data-en="Plan Trip" data-ar="خطط رحلتك">Plan Trip</a>
+      <a href="#services" class="nav-link" data-en="Services" data-ar="خدماتنا">Services</a>
+      <a href="#b2b-visa" class="nav-link" data-en="B2B Visa Renewal" data-ar="تجديد التأشيرات B2B">B2B Visa Renewal</a>
+      <a href="#b2b-apply" class="nav-link" data-en="Apply Now" data-ar="قدّم الآن">Apply Now</a>
+      <a href="#tripForm" class="nav-link" data-en="AI Trip Planner" data-ar="مخطط الرحلات الذكي">AI Trip Planner</a>
       <a href="#about" class="nav-link" data-en="About Us" data-ar="من نحن">About Us</a>
 
       <!-- Language Switcher -->
@@ -45,33 +48,312 @@
     </nav>
   </header>
 
-  <!-- API KEY WARNING BANNER (shown if key not configured) -->
+  <!-- API KEY WARNING BANNER (shown only if key not configured) -->
   <div class="api-warning" id="apiWarning" style="display:none;">
-    <span id="apiWarningText">⚠️ Gemini AI is not configured. Chat responses will be unavailable until you add your API key to <code>backend/.env</code>. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get a free key here →</a></span>
+    <span id="apiWarningText">⚠️ Gemini AI is not configured. Chat responses will be unavailable until you add your API key to <code>backend/.env</code>. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key here →</a></span>
   </div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-label" data-en="POWERED BY DREAM LINE TRAVELS" data-ar="من تقديم دريم لاين للسفر">POWERED BY DREAM LINE TRAVELS</div>
-    <h1 data-en="Explore the World with DreamLine AI" data-ar="استكشف العالم مع دريم لاين الذكي">Explore the World with DreamLine AI</h1>
-    <p data-en="Plan smarter, travel better. Discover destinations, explore hotels, estimate budgets, and create personalized itineraries with our intelligent AI travel assistant." data-ar="خطط بذكاء وسافر بأسلوب أفضل. اكتشف الوجهات وابحث عن الفنادق وقدّر الميزانية وأنشئ خططاً مخصصة مع مساعد السفر الذكي من دريم لاين.">
-      Plan smarter, travel better. Discover destinations, explore hotels, estimate budgets, and create personalized itineraries with our intelligent AI travel assistant.
+  <!-- HERO SECTION (PROMPT 1) -->
+  <section class="hero agency-hero">
+    <div class="hero-label" data-en="WELCOME TO DREAMLINE TRAVELS" data-ar="مرحباً بكم في دريم لاين للسفر">WELCOME TO DREAMLINE TRAVELS</div>
+    <h1 data-en="Explore the World with DreamLine Travels" data-ar="استكشف العالم مع دريم لاين للسفر">Explore the World with DreamLine Travels</h1>
+    <p class="hero-subtitle" data-en="Your Trusted Partner for UAE Visas, Flight Tickets, Tour Packages and Complete Travel Solutions." data-ar="شريكك الموثوق لتأشيرات الإمارات، وتذاكر الطيران، والباقات السياحية، وحلول السفر المتكاملة.">
+      Your Trusted Partner for UAE Visas, Flight Tickets, Tour Packages and Complete Travel Solutions.
     </p>
+    <div class="hero-cta-group">
+      <a href="#services" class="btn-hero-primary" data-en="Explore Our Services" data-ar="استكشف خدماتنا">Explore Our Services</a>
+      <a href="#b2b-apply" class="btn-hero-secondary" data-en="Apply Now" data-ar="قدّم الآن">Apply Now</a>
+    </div>
   </section>
 
-  <!-- TRIP FORM -->
-  <section class="glass-card planner-card" id="tripForm">
-    <form id="tripFormEl">
+  <!-- ABOUT US & TRAVEL SERVICES (PROMPT 2) -->
+  <section id="about" class="glass-card about-agency-card">
+    <div class="section-badge" data-en="ABOUT OUR AGENCY" data-ar="نبذة عن وكالتنا">ABOUT OUR AGENCY</div>
+    <h2 class="section-title" data-en="About DreamLine Travels" data-ar="عن دريم لاين للسفر">About DreamLine Travels</h2>
+    <p class="about-desc" data-en="DreamLine Travels provides reliable and convenient travel solutions for individuals, families and business partners. We specialise in UAE visa services, visa renewals, air ticketing, tour packages and airport assistance." data-ar="توفر دريم لاين للسفر حلول سفر موثوقة ومريحة للأفراد والعائلات وشركاء الأعمال. نحن متخصصون في خدمات تأشيرات الإمارات، وتجديد التأشيرات، وحجز تذاكر الطيران، والباقات السياحية، والمساعدة في المطار.">
+      DreamLine Travels provides reliable and convenient travel solutions for individuals, families and business partners. We specialise in UAE visa services, visa renewals, air ticketing, tour packages and airport assistance.
+    </p>
 
+    <!-- 5 SERVICE CARDS -->
+    <div class="agency-services-grid" id="services">
+
+      <!-- Card 1: UAE Visa Services -->
+      <div class="service-card">
+        <div class="service-icon">🛂</div>
+        <h3 data-en="UAE Visa Services" data-ar="خدمات تأشيرات الإمارات">UAE Visa Services</h3>
+        <ul class="service-list">
+          <li data-en="UAE tourist visas (30 & 60 days)" data-ar="تأشيرات سياحية للإمارات (30 و60 يوماً)">UAE tourist visas (30 &amp; 60 days)</li>
+          <li data-en="Visa assistance & document verification" data-ar="المساعدة في التأشيرات وتدقيق المستندات">Visa assistance &amp; document verification</li>
+          <li data-en="Visa renewal support & extension" data-ar="دعم وتمديد تجديد التأشيرات">Visa renewal support &amp; extension</li>
+        </ul>
+        <a href="#b2b-apply" class="btn-service-apply" data-service="UAE Visa Services" data-en="Apply Now" data-ar="قدّم الآن">Apply Now</a>
+      </div>
+
+      <!-- Card 2: Air Ticketing -->
+      <div class="service-card">
+        <div class="service-icon">✈️</div>
+        <h3 data-en="Air Ticketing" data-ar="حجز تذاكر الطيران">Air Ticketing</h3>
+        <ul class="service-list">
+          <li data-en="Domestic flight bookings (India & regional)" data-ar="حجوزات طيران داخلية (الهند والمنطقة)">Domestic flight bookings (India &amp; regional)</li>
+          <li data-en="International flight bookings worldwide" data-ar="حجوزات طيران دولية لجميع الوجهات">International flight bookings worldwide</li>
+          <li data-en="Competitive fares & date change support" data-ar="أسعار منافسة ودعم تعديل المواعيد">Competitive fares &amp; date change support</li>
+        </ul>
+        <a href="#b2b-apply" class="btn-service-apply" data-service="Air Ticketing" data-en="Apply Now" data-ar="قدّم الآن">Apply Now</a>
+      </div>
+
+      <!-- Card 3: Tour Packages -->
+      <div class="service-card">
+        <div class="service-icon">🏖️</div>
+        <h3 data-en="Tour Packages" data-ar="الباقات والبرامج السياحية">Tour Packages</h3>
+        <ul class="service-list">
+          <li data-en="UAE tour packages (Dubai, Abu Dhabi, Desert Safari)" data-ar="باقات الإمارات (دبي، أبوظبي، سفاري الصحراء)">UAE tour packages (Dubai, Abu Dhabi, Desert Safari)</li>
+          <li data-en="International holiday packages (India, Europe, Asia)" data-ar="عطلات دولية (الهند، أوروبا، آسيا)">International holiday packages (India, Europe, Asia)</li>
+          <li data-en="Tailored family & honeymoon getaways" data-ar="عطلات مخصصة للعائلات وشهر العسل">Tailored family &amp; honeymoon getaways</li>
+        </ul>
+        <a href="#b2b-apply" class="btn-service-apply" data-service="Tour Packages" data-en="Apply Now" data-ar="قدّم الآن">Apply Now</a>
+      </div>
+
+      <!-- Card 4: Airport Assistance -->
+      <div class="service-card">
+        <div class="service-icon">🧳</div>
+        <h3 data-en="Airport Assistance" data-ar="خدمات المساعدة في المطار">Airport Assistance</h3>
+        <ul class="service-list">
+          <li data-en="Airport pickup & drop coordination" data-ar="تنسيق الاستقبال والتوصيل من وإلى المطار">Airport pickup &amp; drop coordination</li>
+          <li data-en="Dedicated travel coordination & transfers" data-ar="تنسيق السفر والتنقلات المخصصة">Dedicated travel coordination &amp; transfers</li>
+          <li data-en="Transit & baggage assistance" data-ar="المساعدة في الترانزيت والأمتعة">Transit &amp; baggage assistance</li>
+        </ul>
+        <a href="#b2b-apply" class="btn-service-apply" data-service="Airport Assistance" data-en="Apply Now" data-ar="قدّم الآن">Apply Now</a>
+      </div>
+
+      <!-- Card 5: Complete Travel Solutions -->
+      <div class="service-card">
+        <div class="service-icon">🌐</div>
+        <h3 data-en="Complete Travel Solutions" data-ar="حلول السفر المتكاملة">Complete Travel Solutions</h3>
+        <ul class="service-list">
+          <li data-en="Comprehensive travel consultation" data-ar="استشارات سياحية شاملة">Comprehensive travel consultation</li>
+          <li data-en="Accommodation & hotel assistance" data-ar="حجز الفنادق وأماكن الإقامة">Accommodation &amp; hotel assistance</li>
+          <li data-en="24/7 dedicated travel support" data-ar="دعم سياحي متواصل على مدار الساعة">24/7 dedicated travel support</li>
+        </ul>
+        <a href="#b2b-apply" class="btn-service-apply" data-service="Complete Travel Solutions" data-en="Apply Now" data-ar="قدّم الآن">Apply Now</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SPECIAL B2B UAE VISA RENEWAL & OMAN BORDER SERVICE (PROMPT 3) -->
+  <section id="b2b-visa" class="glass-card b2b-service-card">
+    <div class="section-badge b2b-badge" data-en="EXCLUSIVE B2B PARTNERSHIP" data-ar="شراكة حصرية B2B">EXCLUSIVE B2B PARTNERSHIP</div>
+    <h2 class="section-title" data-en="B2B UAE Visa Renewal &amp; Oman Border Service" data-ar="خدمة تجديد تأشيرات الإمارات ورحلات حدود عُمان B2B">B2B UAE Visa Renewal &amp; Oman Border Service</h2>
+    <p class="section-subtitle" data-en="Reliable border-trip coordination and visa renewal assistance for travel agencies and business partners." data-ar="تنسيق موثوق لرحلات الحدود والمساعدة في تجديد التأشيرات لوكالات السفر والشركاء التجاريين.">
+      Reliable border-trip coordination and visa renewal assistance for travel agencies and business partners.
+    </p>
+
+    <div class="b2b-info-block">
+      <p data-en="When a traveller's UAE visa is approaching expiry, eligible travellers may require an exit from the UAE and a new visa application. DreamLine Travels provides coordinated bus transportation and assistance with the relevant process." data-ar="عند اقتراب انتهاء صلاحية تأشيرة الإمارات للمسافر، قد يتطلب الأمر خروج المسافر المؤهل من الدولة وتقديم طلب تأشيرة جديدة. توفر دريم لاين للسفر خدمة نقل منسقة بالحافلات والمساعدة في الإجراءات المطلوبة.">
+        When a traveller's UAE visa is approaching expiry, eligible travellers may require an exit from the UAE and a new visa application. DreamLine Travels provides coordinated bus transportation and assistance with the relevant process.
+      </p>
+    </div>
+
+    <div class="b2b-grid">
+      <!-- Pickup Locations -->
+      <div class="b2b-feature-box">
+        <h3>📍 <span data-en="Pickup Locations" data-ar="نقاط الانطلاق والتجمع">Pickup Locations</span></h3>
+        <ul class="b2b-feature-list">
+          <li><strong>Sharjah:</strong> Safari Mall</li>
+          <li><strong>Abu Dhabi:</strong> Safeer Mall, Madinat Zayed</li>
+          <li><strong>Dubai:</strong> Pickup location to be confirmed during booking.</li>
+        </ul>
+      </div>
+
+      <!-- Service Support -->
+      <div class="b2b-feature-box">
+        <h3>🛡️ <span data-en="Service Support Included" data-ar="الدعم والخدمات المقدمة">Service Support Included</span></h3>
+        <ul class="b2b-feature-list">
+          <li data-en="Bus transportation coordination" data-ar="تنسيق النقل بالحافلات">Bus transportation coordination</li>
+          <li data-en="Accommodation arrangements, where included in the package" data-ar="ترتيبات الإقامة، عند تضمينها في الباقة">Accommodation arrangements, where included in the package</li>
+          <li data-en="Food arrangements, where included in the package" data-ar="ترتيبات الوجبات الغذائية، عند تضمينها في الباقة">Food arrangements, where included in the package</li>
+          <li data-en="Visa application assistance" data-ar="المساعدة في تقديم طلب التأشيرة">Visa application assistance</li>
+          <li data-en="Travel coordination and customer support" data-ar="تنسيق السفر وخدمة العملاء">Travel coordination and customer support</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Indicative Pricing Display -->
+    <div class="b2b-pricing-wrapper">
+      <h3 class="pricing-headline" data-en="Indicative Package Pricing" data-ar="الأسعار التقديرية للباقات">Indicative Package Pricing</h3>
+      <div class="pricing-cards-row">
+        <div class="price-pill-card">
+          <div class="price-title" data-en="Sharjah Package" data-ar="باقة الشارقة">Sharjah Package</div>
+          <div class="price-val">AED 1,200</div>
+          <div class="price-sub" data-en="Safari Mall Departure" data-ar="الانطلاق من سفاري مول">Safari Mall Departure</div>
+        </div>
+        <div class="price-pill-card featured">
+          <div class="price-title" data-en="UAE Package" data-ar="باقة الإمارات">UAE Package</div>
+          <div class="price-val">AED 780</div>
+          <div class="price-sub" data-en="Standard Visa Coordination" data-ar="تنسيق التأشيرات المعتمد">Standard Visa Coordination</div>
+        </div>
+      </div>
+
+      <!-- Prominent Pricing Disclaimer -->
+      <div class="pricing-disclaimer-box">
+        <p><strong>⚠️ <span data-en="Pricing Note:" data-ar="ملاحظة الأسعار:">Pricing Note:</span></strong> <span data-en="Prices are indicative and may change depending on demand, availability and operational requirements. Final prices must be confirmed by DreamLine Travels before booking." data-ar="الأسعار استرشادية وقد تتغير حسب الطلب والتوافر والمتطلبات التشغيلية. يجب تأكيد الأسعار النهائية من دريم لاين للسفر قبل تأكيد الحجز.">Prices are indicative and may change depending on demand, availability and operational requirements. Final prices must be confirmed by DreamLine Travels before booking.</span></p>
+      </div>
+
+      <!-- Legal Authority Disclaimer -->
+      <div class="legal-authority-box">
+        <p><strong>ℹ️ <span data-en="Immigration Notice:" data-ar="تنويه الهجرة والجوازات:">Immigration Notice:</span></strong> <span data-en="DreamLine Travels does not guarantee visa approval, border entry, re-entry or a specific immigration outcome. Eligibility, immigration requirements and approvals depend strictly on the relevant authorities. Travellers must confirm their eligibility and valid travel documents before departure." data-ar="لا تضمن دريم لاين للسفر الموافقة على التأشيرة، أو الدخول عبر الحدود، أو إعادة الدخول، أو أي قرار هجرة محدد. إن الأهلية وشروط الهجرة والموافقات تخضع كلياً لتقدير السلطات الرسمية المختصة. يجب على المسافرين التأكد من أهليتهم وصلاحية وثائق سفرهم قبل المغادرة.">DreamLine Travels does not guarantee visa approval, border entry, re-entry or a specific immigration outcome. Eligibility, immigration requirements and approvals depend strictly on the relevant authorities. Travellers must confirm their eligibility and valid travel documents before departure.</span></p>
+      </div>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="#b2b-apply" class="btn-hero-primary" data-en="Apply for B2B Service Now" data-ar="قدّم لخدمة B2B الآن">Apply for B2B Service Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- B2B APPLICATION & WHATSAPP BOOKING FORM (PROMPT 4) -->
+  <section id="b2b-apply" class="glass-card b2b-form-card">
+    <div class="section-badge" data-en="FAST BOOKING" data-ar="حجز سريع">FAST BOOKING</div>
+    <h2 class="section-title" data-en="Apply for B2B Service" data-ar="التقديم على خدمة B2B">Apply for B2B Service</h2>
+    <p class="form-desc" data-en="Fill out this quick form. Upon submission, an application summary will be prepared for WhatsApp so you can review and send it directly to our travel desk." data-ar="يرجى ملء النموذج السريع أدناه. عند الإرسال، سيتم تجهيز ملخص طلبك عبر واتساب لتتمكن من مراجعته وإرساله مباشرة إلى مكتب السفر لدينا.">
+      Fill out this quick form. Upon submission, an application summary will be prepared for WhatsApp so you can review and send it directly to our travel desk.
+    </p>
+
+    <form id="b2bApplicationForm" novalidate>
       <div class="form-grid">
 
+        <!-- 1. Full Name -->
+        <div class="form-group">
+          <label for="b2bFullName"><span data-en="Full Name" data-ar="الاسم الكامل">Full Name</span> <span class="req">*</span></label>
+          <input type="text" id="b2bFullName" class="form-control" placeholder="e.g. Mohammed Al Hashmi" required>
+          <div class="form-error" id="errFullName"></div>
+        </div>
+
+        <!-- 2. WhatsApp Number -->
+        <div class="form-group">
+          <label for="b2bWhatsapp"><span data-en="WhatsApp Number" data-ar="رقم الواتساب">WhatsApp Number</span> <span class="req">*</span></label>
+          <input type="tel" id="b2bWhatsapp" class="form-control" placeholder="e.g. +971 50 123 4567" required>
+          <div class="form-error" id="errWhatsapp"></div>
+        </div>
+
+        <!-- 3. Nationality -->
+        <div class="form-group">
+          <label for="b2bNationality"><span data-en="Nationality" data-ar="الجنسية">Nationality</span> <span class="req">*</span></label>
+          <input type="text" id="b2bNationality" class="form-control" placeholder="e.g. Indian, Filipino, Pakistani" required>
+          <div class="form-error" id="errNationality"></div>
+        </div>
+
+        <!-- 4. Current UAE Location -->
+        <div class="form-group">
+          <label for="b2bCurrentLocation"><span data-en="Current UAE Location" data-ar="مكان الإقامة الحالي في الإمارات">Current UAE Location</span> <span class="req">*</span></label>
+          <input type="text" id="b2bCurrentLocation" class="form-control" placeholder="e.g. Deira, Dubai / Al Nahda, Sharjah" required>
+          <div class="form-error" id="errCurrentLocation"></div>
+        </div>
+
+        <!-- 5. Preferred Pickup Location -->
+        <div class="form-group">
+          <label for="b2bPickupLocation"><span data-en="Preferred Pickup Location" data-ar="نقطة الانطلاق المفضلة">Preferred Pickup Location</span> <span class="req">*</span></label>
+          <select id="b2bPickupLocation" class="form-control" required>
+            <option value="" disabled selected data-en="Select pickup location" data-ar="اختر نقطة الانطلاق">Select pickup location</option>
+            <option value="Sharjah – Safari Mall">Sharjah – Safari Mall</option>
+            <option value="Abu Dhabi – Safeer Mall, Madinat Zayed">Abu Dhabi – Safeer Mall, Madinat Zayed</option>
+            <option value="Dubai – Location to be confirmed during booking">Dubai (Location to be confirmed during booking)</option>
+          </select>
+          <div class="form-error" id="errPickupLocation"></div>
+        </div>
+
+        <!-- 6. Visa Expiry Date -->
+        <div class="form-group">
+          <label for="b2bVisaExpiry"><span data-en="Visa Expiry Date" data-ar="تاريخ انتهاء التأشيرة">Visa Expiry Date</span> <span class="req">*</span></label>
+          <input type="date" id="b2bVisaExpiry" class="form-control" required>
+          <div class="form-error" id="errVisaExpiry"></div>
+        </div>
+
+        <!-- 7. Number of Adults -->
+        <div class="form-group">
+          <label for="b2bAdults"><span data-en="Number of Adults (12+ yrs)" data-ar="عدد البالغين (12+ سنة)">Number of Adults (12+ yrs)</span> <span class="req">*</span></label>
+          <input type="number" id="b2bAdults" class="form-control" min="1" max="50" value="1" required>
+          <div class="form-error" id="errAdults"></div>
+        </div>
+
+        <!-- 8. Number of Children -->
+        <div class="form-group">
+          <label for="b2bChildren"><span data-en="Number of Children (Under 12)" data-ar="عدد الأطفال (أقل من 12 سنة)">Number of Children (Under 12)</span></label>
+          <input type="number" id="b2bChildren" class="form-control" min="0" max="25" value="0">
+        </div>
+
+        <!-- 9. Required Service -->
+        <div class="form-group">
+          <label for="b2bServiceRequired"><span data-en="Required Service" data-ar="الخدمة المطلوبة">Required Service</span> <span class="req">*</span></label>
+          <select id="b2bServiceRequired" class="form-control" required>
+            <option value="UAE Visa Renewal Assistance" selected data-en="UAE Visa Renewal Assistance" data-ar="المساعدة في تجديد تأشيرة الإمارات">UAE Visa Renewal Assistance</option>
+            <option value="Oman Border Trip" data-en="Oman Border Trip" data-ar="رحلة حدود عُمان">Oman Border Trip</option>
+            <option value="Other Visa Assistance" data-en="Other Visa Assistance" data-ar="مساعدة تأشيرات أخرى">Other Visa Assistance</option>
+          </select>
+        </div>
+
+        <!-- 10. Accommodation Required -->
+        <div class="form-group">
+          <label for="b2bAccommodation"><span data-en="Accommodation Required?" data-ar="هل تحتاج إقامة فندقية؟">Accommodation Required?</span></label>
+          <select id="b2bAccommodation" class="form-control">
+            <option value="Yes" data-en="Yes" data-ar="نعم">Yes</option>
+            <option value="No" selected data-en="No" data-ar="لا">No</option>
+          </select>
+        </div>
+
+        <!-- 11. Food Required -->
+        <div class="form-group">
+          <label for="b2bFood"><span data-en="Food Required?" data-ar="هل تحتاج وجبات غذائية؟">Food Required?</span></label>
+          <select id="b2bFood" class="form-control">
+            <option value="Yes" data-en="Yes" data-ar="نعم">Yes</option>
+            <option value="No" selected data-en="No" data-ar="لا">No</option>
+          </select>
+        </div>
+
+        <!-- 12. Additional Requirements -->
+        <div class="form-group full-width">
+          <label for="b2bNotes"><span data-en="Additional Requirements / Notes" data-ar="متطلبات إضافية / ملاحظات">Additional Requirements / Notes</span></label>
+          <textarea id="b2bNotes" class="form-control" rows="3" placeholder="e.g. urgent processing, specific dates, group discount inquiry..."></textarea>
+        </div>
+
+      </div>
+
+      <!-- Consent Checkbox -->
+      <div class="form-consent-group">
+        <label class="consent-checkbox-label">
+          <input type="checkbox" id="b2bConsent" required>
+          <span data-en="I agree that DreamLine Travels may contact me on WhatsApp regarding this application." data-ar="أوافق على قيام دريم لاين للسفر بالتواصل معي عبر واتساب بخصوص هذا الطلب.">I agree that DreamLine Travels may contact me on WhatsApp regarding this application.</span>
+        </label>
+        <div class="form-error" id="errConsent"></div>
+      </div>
+
+      <!-- WhatsApp Notice Banner -->
+      <div id="whatsappStatusAlert" class="whatsapp-alert-box" style="display:none;"></div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary btn-submit-application" id="btnSubmitApplication">
+          <span data-en="📲 Submit Application via WhatsApp" data-ar="📲 إرسال الطلب عبر واتساب">📲 Submit Application via WhatsApp</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- AI TRIP PLANNER SECTION (PRESERVED) -->
+  <section class="glass-card planner-card" id="tripForm">
+    <div class="section-badge" data-en="SMART AI PLANNER" data-ar="المخطط الذكي">SMART AI PLANNER</div>
+    <h2 class="section-title" data-en="Plan Your Custom Holiday Itinerary" data-ar="خطط برنامج عطلتك المخصص">Plan Your Custom Holiday Itinerary</h2>
+    <p class="form-desc" data-en="Experience our multi-agent AI travel orchestration engine. Generate a comprehensive day-by-day plan with estimated budgets and hotel ideas." data-ar="جرب محرك تخطيط السفر متعدد الوكلاء الذكي. أنشئ برنامجاً يومياً شاملاً مع الميزانيات المقدرة وتوصيات الفنادق.">
+      Experience our multi-agent AI travel orchestration engine. Generate a comprehensive day-by-day plan with estimated budgets and hotel ideas.
+    </p>
+
+    <form id="tripFormEl">
+      <div class="form-grid">
         <div class="form-group">
           <label for="destination" data-en="Destination City" data-ar="مدينة الوجهة">Destination City</label>
           <input
             type="text"
             id="destination"
             class="form-control"
-            placeholder="e.g. Dubai, Paris, Tokyo"
+            placeholder="e.g. Dubai, Kochi, Paris"
             value="Dubai"
             required
           >
@@ -135,12 +417,10 @@
             <option value="luxury" data-en="Luxury (5★ Resorts)" data-ar="فاخر (منتجعات 5 نجوم)">Luxury (5★ Resorts)</option>
           </select>
         </div>
-
       </div>
 
       <div class="form-group preferences-group">
         <label data-en="Travel Preferences &amp; Interests" data-ar="تفضيلات السفر والاهتمامات">Travel Preferences &amp; Interests</label>
-
         <div class="preference-chips">
           <label class="chip-label">
             <input type="checkbox" name="preferences" value="culture" checked>
@@ -178,67 +458,57 @@
       </div>
 
       <button type="submit" class="btn-primary" id="generatePlanBtn">
-        <span data-en="🚀 Generate Itinerary with DreamLine AI" data-ar="🚀 إنشاء خطة السفر مع دريم لاين">🚀 Generate Itinerary with DreamLine AI</span>
+        <span data-en="🚀 Generate Itinerary with AI Planner" data-ar="🚀 إنشاء خطة السفر بالذكاء الاصطناعي">🚀 Generate Itinerary with AI Planner</span>
       </button>
-
     </form>
   </section>
 
-  <!-- AGENT TRACKER -->
+  <!-- AGENT TRACKER (PRESERVED) -->
   <section class="glass-card agent-tracker" id="agentTracker">
-    <div class="tracker-title" data-en="🤖 DreamLine Multi-Agent Execution Pipeline" data-ar="🤖 منظومة وكلاء دريم لاين متعددي المهام">
-      🤖 DreamLine Multi-Agent Execution Pipeline
+    <div class="tracker-title" data-en="🤖 Multi-Agent Execution Pipeline" data-ar="🤖 منظومة وكلاء التخطيط متعددي المهام">
+      🤖 Multi-Agent Execution Pipeline
     </div>
-
     <div class="agents-flow">
-
       <div class="agent-card" id="agent-manager">
         <div class="icon">🧭</div>
         <div class="role" data-en="Travel Manager" data-ar="مدير السفر">Travel Manager</div>
         <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
-
       <div class="agent-card" id="agent-dest">
         <div class="icon">🏛️</div>
         <div class="role" data-en="Destination Agent" data-ar="وكيل الوجهات">Destination Agent</div>
         <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
-
       <div class="agent-card" id="agent-weather">
         <div class="icon">☀️</div>
         <div class="role" data-en="Weather Agent" data-ar="وكيل الطقس">Weather Agent</div>
         <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
-
       <div class="agent-card" id="agent-hotel">
         <div class="icon">🏨</div>
         <div class="role" data-en="Hotel Agent" data-ar="وكيل الفنادق">Hotel Agent</div>
         <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
-
       <div class="agent-card" id="agent-budget">
         <div class="icon">💰</div>
         <div class="role" data-en="Budget Agent" data-ar="وكيل الميزانية">Budget Agent</div>
         <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
-
       <div class="agent-card" id="agent-itinerary">
         <div class="icon">🗺️</div>
         <div class="role" data-en="Itinerary Agent" data-ar="وكيل البرامج السياحية">Itinerary Agent</div>
         <div class="status-text" data-en="Waiting..." data-ar="في الانتظار...">Waiting...</div>
       </div>
-
     </div>
   </section>
 
-  <!-- RESULTS -->
+  <!-- RESULTS DASHBOARD (PRESERVED) -->
   <section class="results-dashboard" id="resultsDashboard">
-
     <div class="dashboard-header">
       <div>
         <h2 id="resDestTitle">Dubai (3 Days)</h2>
-        <p data-en="Personalized multi-agent itinerary compiled by DreamLine AI." data-ar="برنامج سياحي مخصص أعده دريم لاين الذكي.">
-          Personalized multi-agent itinerary compiled by DreamLine AI.
+        <p data-en="Personalized multi-agent itinerary compiled for you." data-ar="برنامج سياحي مخصص أعدته المنظومة الذكية.">
+          Personalized multi-agent itinerary compiled for you.
         </p>
       </div>
       <button class="btn-pdf" id="downloadPdfBtn">
@@ -289,12 +559,10 @@
       <h3>📅 <span data-en="Day-by-Day Detailed Itinerary" data-ar="البرنامج اليومي التفصيلي">Day-by-Day Detailed Itinerary</span></h3>
       <div class="timeline" id="resTimeline"></div>
     </div>
-
   </section>
 
-  <!-- CHAT ASSISTANT -->
+  <!-- CHAT ASSISTANT DRAWER (PRESERVED) -->
   <div class="chat-drawer collapsed" id="chatDrawer">
-
     <button
       type="button"
       class="chat-header"
@@ -305,7 +573,6 @@
       <span class="chat-hint" data-en="Open" data-ar="افتح">Open</span>
     </button>
 
-    <!-- Chat toolbar -->
     <div class="chat-toolbar" id="chatToolbar">
       <button class="chat-tool-btn" id="clearChatBtn" title="Clear chat">
         🗑️ <span data-en="Clear" data-ar="مسح">Clear</span>
@@ -323,7 +590,7 @@
       <input
         type="text"
         id="chatInput"
-        placeholder="Ask about Dubai, Abu Dhabi, hotels, itineraries..."
+        placeholder="Ask about Dubai, UAE visas, currency conversion, hotels..."
         aria-label="Chat message"
         maxlength="1000"
       >
@@ -331,24 +598,13 @@
         <span data-en="Send" data-ar="إرسال">Send</span>
       </button>
     </div>
-
   </div>
-
-  <!-- ABOUT -->
-  <section id="about" class="glass-card about-section">
-    <h3 data-en="About Dream Line Travels" data-ar="عن دريم لاين للسفر">About Dream Line Travels</h3>
-    <p data-en="Dream Line Travels combines AI technology with deep travel expertise to deliver personalized itineraries for the UAE and beyond. DreamLine AI Agent coordinates specialized agents to research destinations, hotels, budgets, and travel experiences — all tailored to your preferences." data-ar="تجمع دريم لاين للسفر بين تقنية الذكاء الاصطناعي والخبرة السياحية العميقة لتقديم برامج سياحية مخصصة في الإمارات وخارجها. يقوم دريم لاين الذكي بتنسيق وكلاء متخصصين للبحث عن الوجهات والفنادق والميزانيات وتجارب السفر، كلها مصممة وفق تفضيلاتك.">
-      Dream Line Travels combines AI technology with deep travel expertise to deliver personalized itineraries for the UAE and beyond. DreamLine AI Agent coordinates specialized agents to research destinations, hotels, budgets, and travel experiences — all tailored to your preferences.
-    </p>
-  </section>
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>© 2026 Dream Line Travels. <span data-en="All Rights Reserved." data-ar="جميع الحقوق محفوظة.">All Rights Reserved.</span></p>
+    <p>© 2026 DreamLine Travels. <span data-en="All Rights Reserved." data-ar="جميع الحقوق محفوظة.">All Rights Reserved.</span></p>
     <p>
-      <span data-en="Powered by" data-ar="مشغّل بواسطة">Powered by</span>
-      <strong>DreamLine AI Agent</strong>
-      | <span data-en="Your Intelligent Travel Companion" data-ar="رفيقك الذكي في السفر">Your Intelligent Travel Companion</span>
+      <span data-en="Your Trusted Partner for UAE Visas, Flights, Tours & B2B Solutions." data-ar="شريككم الموثوق لتأشيرات الإمارات، وتذاكر الطيران، والرحلات وحلول B2B.">Your Trusted Partner for UAE Visas, Flights, Tours &amp; B2B Solutions.</span>
     </p>
   </footer>
 

@@ -29,6 +29,7 @@ class Settings:
         self.APP_DEBUG: bool = os.getenv("APP_DEBUG", "true").lower() in ("true", "1", "yes")
         self.PORT: int = int(os.getenv("PORT", "8000"))
         self.HOST: str = os.getenv("HOST", "127.0.0.1")
+        self.WHATSAPP_BUSINESS_PHONE: str = os.getenv("WHATSAPP_BUSINESS_PHONE", "")
 
         # LLM Settings
         self.GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
