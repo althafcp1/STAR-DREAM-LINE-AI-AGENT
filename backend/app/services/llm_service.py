@@ -116,7 +116,7 @@ class GeminiLLMService:
         )
 
         try:
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request, timeout=90) as response:
                 try:
                     result = json.loads(
                         response.read().decode("utf-8")
